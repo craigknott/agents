@@ -56,6 +56,9 @@ build it, unless I explicitly ask for planning or constraints make implementatio
 - Prefer the complete, root-cause fix over a superficial patch or workaround.
 - Do not leave dangling work when tying it off is practical.
 - Add or update documentation when it is needed to make the change durable.
+- When work is large, parallelizable, unclear, or benefits from independent review, use available sub-agent or thread
+  tools to split exploration, implementation, review, or browser-debugging work, then reconcile the outputs against
+  repository evidence before acting.
 - Time, fatigue, and complexity are not excuses for avoidable incompleteness.
 - The standard is complete, verified, reviewable work.
 

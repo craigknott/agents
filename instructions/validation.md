@@ -13,6 +13,20 @@ For implementation tasks:
 6. Inspect the final diff for unrelated changes, secrets, debug code, and accidental churn.
 7. Summarize changes, validation, and residual risk.
 
+# Review Repair Validate Loops
+
+For non-trivial implementation, docs, artifact, or modernization work, use a review -> repair -> validate loop when
+feedback can be measured with tests, execution, static checks, visual checks, or a clear rubric.
+
+- Review: inspect the current artifact and produce concrete findings before editing when scope or failure modes are
+  unclear.
+- Repair: make focused edits using the review findings and the latest validation feedback.
+- Validate: run the relevant checks and treat failures as evidence for the next repair pass.
+- Repeat while the remaining validation delta is changing and the next repair is clear.
+- Stop when validation passes, the same delta repeats, a maximum reasonable attempt count is reached, or human judgment is
+  needed.
+- Keep an audit trail in the final summary: findings addressed, changes made, validation run, and remaining delta.
+
 # Validation Order
 
 Always validate the smallest relevant scope first, then broaden as confidence increases:
