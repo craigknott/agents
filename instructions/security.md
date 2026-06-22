@@ -10,10 +10,11 @@ input validation, or other security-sensitive work.
 
 # Security Workflows
 
-- Use dedicated security skills and workflows when they apply.
-- Use `mitigating-vuln` for vulnerability remediation, CVE triage, base image upgrades, and dependency fixes.
+- Use dedicated security skills and workflows when they apply and are installed.
+- Use `mitigating-vuln` for vulnerability remediation, CVE triage, base image upgrades, and dependency fixes when it is
+  installed.
 - Use `trivy-security-scan` before commits or when scanning containers, local directories, projects, or remote repos for
-  CVEs.
+  CVEs when it is installed.
 - Prefer stack-native dependency and security checks when relevant.
 - Report actionable findings and remediation options, not raw noise.
 

@@ -10,19 +10,30 @@ Context7, or other task-specific tools.
 - Parallelize independent file reads and searches when the available tooling supports it.
 - Do not claim a tool, connector, or skill was used unless it exists in the current environment and was actually used.
 
-# Preferred Skills
+# Preferred Capabilities
 
-Use these skills when they fit the task and are available:
+Use these capabilities when they fit the task and are available:
 
 - `playwright-cli` for terminal-first browser automation and visual QA
 - `imagegen` for bitmap asset generation or image editing
 - `openai-docs` for OpenAI API, model, SDK, and Codex questions
 - Context7 for third-party library and framework documentation
 - Figma skills for design-to-code and Figma file operations when available
-- `create-pr` for opening or refreshing pull requests that follow Atlassian conventions
 - `mitigating-vuln` and `trivy-security-scan` for vulnerability and container security work
 - Google Drive, Docs, Sheets, and Slides skills when source material or deliverables live in Drive
 - Slack skills for reading Slack context or drafting outbound Slack messages
+
+# Skill Installation Setup
+
+- Install reusable Codex skills into `$CODEX_HOME/skills` (normally `~/.codex/skills`) rather than vendoring skill
+  implementations into this instructions repository.
+- Use the `skill-installer` workflow to list or install curated skills. It installs from `openai/skills` by default and
+  can also install from a specific GitHub repo/path.
+- From the installed `skill-installer` skill directory, public GitHub skills can be installed with
+  `scripts/install-skill-from-github.py --repo <owner>/<repo> --path <path/to/skill>`.
+- After installing or updating skills, restart Codex so the new skills are discovered.
+- If a preferred skill is missing, say which skill or capability is missing and recommend installation instead of
+  silently assuming it exists.
 
 # Skill Maintenance
 

@@ -25,7 +25,6 @@ feedback.
 - Use `NOISSUE` when there is no tracked issue ID.
 - Use `instructions/risk.md` to choose the risk level.
 - Summarize what changed, what was verified, and meaningful residual risk.
-- For Atlassian PR workflows, prefer the `create-pr` skill when opening or refreshing a PR.
 - When addressing review comments, resolve the underlying issue rather than only satisfying wording.
 
 # CI And Review Feedback
