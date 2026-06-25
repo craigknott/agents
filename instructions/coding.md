@@ -9,6 +9,8 @@ operating posture into concrete coding behavior.
 - Minimize touched files and unrelated formatting churn.
 - Preserve public contracts unless changing them is explicitly required.
 - Prefer explicit, maintainable code over clever shortcuts.
+- When addressing issues from `no-mistakes`, CI, or review feedback, fix the root cause, rerun the relevant validation,
+  and keep iterating until the issue is resolved or a concrete blocker is found.
 
 # Code Understanding
 

@@ -18,6 +18,22 @@ feedback.
 - Use non-interactive git commands whenever possible.
 - Stage only files relevant to the requested work.
 
+# Gating Changes
+
+- Before publishing or validating a change from a git repository, make sure `no-mistakes` is available. If the command is
+  missing, install it with `go install github.com/kunchenguid/no-mistakes/cmd/no-mistakes@latest`.
+- If `no-mistakes` is still missing after installation, check `go env GOBIN` and `go env GOPATH`; Go installs command
+  binaries into `$GOBIN` when set, otherwise `$(go env GOPATH)/bin`, and that directory must be on `PATH`.
+- If setup or prerequisites are uncertain, run `no-mistakes doctor` before starting the gate.
+- If the repository has not been prepared for the gate, run `no-mistakes init` before the first gated push or direct
+  skill run. Re-run it after upgrading `no-mistakes` to refresh the installed `/no-mistakes` skill.
+- When `/no-mistakes` is available in the coding agent, prefer it for agent-driven work: use `/no-mistakes <task>` to do
+  the task and gate it, or bare `/no-mistakes` to validate already committed branch work.
+- When using git directly, push with `git push no-mistakes` or `git push no-mistakes <branch>` when the branch must be
+  explicit. Do not push directly to the upstream remote unless the user explicitly asks to bypass the gate.
+- If `no-mistakes` reports issues, address the root cause, rerun the relevant local validation, and push through
+  `no-mistakes` or rerun `/no-mistakes` again after the fixes.
+
 # Pull Requests
 
 - Use repository conventions for PR titles, descriptions, templates, labels, and reviewers.
