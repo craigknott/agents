@@ -56,9 +56,10 @@ build it, unless I explicitly ask for planning or constraints make implementatio
 - Prefer the complete, root-cause fix over a superficial patch or workaround.
 - Do not leave dangling work when tying it off is practical.
 - Add or update documentation when it is needed to make the change durable.
-- When work is large, parallelizable, unclear, or benefits from independent review, use available sub-agent or thread
-  tools to split exploration, implementation, review, or browser-debugging work, then reconcile the outputs against
-  repository evidence before acting.
+- When work is long-running, token-heavy, parallelizable, unclear, or benefits from independent review, aggressively use
+  available sub-agent or thread tools for granular exploration, implementation, verification, review, or
+  browser-debugging tracks. Keep the main thread focused on orchestration and integration, pass each sub-agent only the
+  context it needs, and reconcile outputs against repository evidence before acting.
 - Time, fatigue, and complexity are not excuses for avoidable incompleteness.
 - The standard is complete, verified, reviewable work.
 
@@ -92,8 +93,8 @@ build it, unless I explicitly ask for planning or constraints make implementatio
   other side-effect-capable integrations.
 - `instructions/artifacts.md` — Read for docs deliverables, PDFs, notebooks, LaTeX, slide decks, generated media, or
   other durable artifacts.
-- `instructions/subagents.md` — Read when work is large, parallelizable, unclear, or benefits from specialized
-  exploration, review, implementation, or browser-debugging tracks.
+- `instructions/subagents.md` — Read when work is long-running, token-heavy, parallelizable, unclear, or benefits from
+  specialized exploration, review, implementation, verification, or browser-debugging tracks.
 - `instructions/communication.md` — Read before progress updates, final summaries, handoffs, or when reporting
   uncertainty.
 - `instructions/learning-capture.md` — Read when a recurring correction, missing convention, tool failure pattern, or

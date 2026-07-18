@@ -24,6 +24,8 @@ Prefer repository-expressed workflows over generic assumptions.
 
 # Operating Posture
 
+- At the start of work in any git repository, check whether `no-mistakes` has been initialized. If the repository is not
+  initialized and `no-mistakes` is available, run `no-mistakes init` before making implementation changes.
 - Be concise, exact, and evidence-driven.
 - Keep changes minimal unless the task explicitly calls for refactoring or migration.
 - Preserve public contracts unless the task explicitly requires changing them.

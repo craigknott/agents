@@ -19,6 +19,7 @@ Use these capabilities when they fit the task and are available:
 - `openai-docs` for OpenAI API, model, SDK, and Codex questions
 - Context7 for third-party library and framework documentation
 - Figma skills for design-to-code and Figma file operations when available
+- `/review` for required self-review before pushing changes, including any subagent or thread review findings
 - `/no-mistakes` for gated validation and PR preparation after `no-mistakes init` has installed the skill
 - `mitigating-vuln` and `trivy-security-scan` for vulnerability and container security work
 - Google Drive, Docs, Sheets, and Slides skills when source material or deliverables live in Drive

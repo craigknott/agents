@@ -24,11 +24,17 @@ feedback.
   missing, install it with `go install github.com/kunchenguid/no-mistakes/cmd/no-mistakes@latest`.
 - If `no-mistakes` is still missing after installation, check `go env GOBIN` and `go env GOPATH`; Go installs command
   binaries into `$GOBIN` when set, otherwise `$(go env GOPATH)/bin`, and that directory must be on `PATH`.
-- If setup or prerequisites are uncertain, run `no-mistakes doctor` before starting the gate.
-- If the repository has not been prepared for the gate, run `no-mistakes init` before the first gated push or direct
-  skill run. Re-run it after upgrading `no-mistakes` to refresh the installed `/no-mistakes` skill.
+- At the start of work in a git repository, check whether the repository has been prepared for the gate. If not, run
+  `no-mistakes init` before making implementation changes, opening a gated skill run, or pushing.
+- If setup or prerequisites are uncertain after initialization, run `no-mistakes doctor` before starting the gate.
+- Re-run `no-mistakes init` after upgrading `no-mistakes` to refresh the installed `/no-mistakes` skill.
 - When `/no-mistakes` is available in the coding agent, prefer it for agent-driven work: use `/no-mistakes <task>` to do
   the task and gate it, or bare `/no-mistakes` to validate already committed branch work.
+- Before any push path, run a self-review. If `/review` is available in the active agent, use it on the intended diff
+  before pushing. Include findings from any subagent or thread review in that self-review context, and fix, explicitly
+  defer with rationale, or escalate every finding before pushing.
+- If `/review` is unavailable, perform a manual self-review using `instructions/code-review.md`,
+  `instructions/validation.md`, and the final diff; state that `/review` was unavailable when summarizing the push.
 - When using git directly, push with `git push no-mistakes` or `git push no-mistakes <branch>` when the branch must be
   explicit. Do not push directly to the upstream remote unless the user explicitly asks to bypass the gate.
 - If `no-mistakes` reports issues, address the root cause, rerun the relevant local validation, and push through

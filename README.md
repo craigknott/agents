@@ -26,7 +26,7 @@ export PATH="$(go env GOPATH)/bin:$PATH"
 
 Persist that line in your shell startup file, such as `~/.zshrc`, when needed.
 
-Initialize `no-mistakes` in each git repository before the first gated push:
+Initialize `no-mistakes` in each git repository before starting agent work there:
 
 ```sh
 no-mistakes init

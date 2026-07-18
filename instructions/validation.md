@@ -91,6 +91,8 @@ Before final response or PR creation:
 - Remove debug logs, commented-out code, accidental formatting churn, and unrelated edits.
 - Confirm tests match the changed behavior rather than implementation details.
 - Confirm no secrets, credentials, or local-only paths were introduced.
+- For changes that will be pushed, follow the required pre-push self-review path in `instructions/git-and-pr.md`,
+  including `/review` when available and any subagent or thread review findings.
 
 # Reporting
 
