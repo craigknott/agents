@@ -2,7 +2,8 @@
 
 Personal, cross-repository instructions for coding agents.
 
-`AGENTS.md` is the source of truth. Tool-specific instruction files should stay as thin forwarders so the same guidance is loaded everywhere.
+`AGENTS.md` is the source of truth for these cross-agent preferences. Tool-specific instruction files should stay as
+thin forwarders so the same guidance is loaded everywhere.
 
 ## Setup
 
@@ -26,11 +27,14 @@ export PATH="$(go env GOPATH)/bin:$PATH"
 
 Persist that line in your shell startup file, such as `~/.zshrc`, when needed.
 
-Initialize `no-mistakes` in each git repository before starting agent work there:
+Initialize `no-mistakes` only in repositories where you want to use its validation gate:
 
 ```sh
 no-mistakes init
 ```
+
+The agent defaults use this gate for requested pushes unless the user or repository specifies another workflow; ordinary
+repository work does not trigger initialization.
 
 `no-mistakes init` also installs the `/no-mistakes` agent skill. From a supported coding agent, you can gate a task
 directly:

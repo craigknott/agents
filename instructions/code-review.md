@@ -1,29 +1,17 @@
-Use this file when the user asks for a review, audit, risk assessment, PR feedback, or asks whether a change is ready.
-Default to a code-review stance rather than rewriting code unless the user asks for fixes.
+Use for code reviews, audits, readiness checks, and risk assessments. Review without editing unless fixes are requested.
 
-# Review Priorities
+## Findings
 
-Lead with findings, ordered by severity:
+- Lead with actionable findings ordered by severity.
+- Prioritize correctness, regressions, security, missing tests, reliability, and maintainability.
+- Give each finding a precise file and line reference, explain its impact, and avoid style-only comments.
+- If there are no findings, say so and note any validation gaps or residual risk.
 
-1. Correctness
-2. Regressions and edge cases
-3. Security
-4. Missing tests
-5. Reliability and operability
-6. Maintainability
+## Risk
 
-# Findings Format
+- **Low:** Documentation, tests, or isolated internal changes with no public behavior change.
+- **Medium:** User-visible behavior, shared paths, dependencies, configuration, or non-critical API changes.
+- **High:** Authentication, data integrity, payments, migrations, public contracts, difficult rollback, or materially
+  incomplete validation.
 
-- Ground each finding in a concrete file and line reference when possible.
-- Explain the impact, not just the observation.
-- Avoid style-only comments unless they hide a real bug or materially harm maintainability.
-- Include open questions or assumptions after findings.
-- Keep summaries brief and secondary to the findings.
-- If no issues are found, say that clearly and mention any remaining test gaps or residual risk.
-
-# Review Scope
-
-- Check whether tests cover the behavior being changed.
-- For backend or distributed-system changes, also read `instructions/reliability.md`.
-- For security-sensitive changes, also read `instructions/security.md`.
-- For UI changes, also read `instructions/frontend.md`.
+Name the concrete risk driver rather than reporting only the level.
