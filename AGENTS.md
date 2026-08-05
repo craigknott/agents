@@ -1,19 +1,22 @@
 # Global Agent Defaults
 
 This repository contains cross-repository preferences for coding agents. Keep these instructions focused on outcomes and
-project conventions; defer safety, permissions, tool mechanics, orchestration, and communication behavior to the active
-harness.
+project conventions; defer safety, permissions, tool mechanics, and communication behavior to the active harness.
 
 Within this instruction layer, repository-specific guidance and checked-in workflows take precedence. Read only the
 topic files relevant to the current task.
 
 ## Working Style
 
-- Complete implementation requests end to end without expanding beyond the requested scope.
+- Complete implementation requests end to end, including integration and proportionate validation, without expanding
+  beyond the requested scope or leaving avoidable placeholders and follow-up work.
+- Prefer the simplest cohesive design that satisfies the requested behavior and preserves maintainability.
 
 ## Topics
 
-- `instructions/workflow.md` — Repository discovery, implementation, and validation.
+- `instructions/workflow.md` — Repository discovery, implementation design, reuse, coding style, and validation.
+- `instructions/subagents.md` — Read before delegating: permission, decision criteria, routing, scoping, and
+  integration.
 - `instructions/package-managers.md` — Package-manager selection and dependency changes.
 - `instructions/code-review.md` — Reviews, findings, and risk classification.
 - `instructions/git-and-pr.md` — Branches, commits, pushes, pull requests, and `no-mistakes`.

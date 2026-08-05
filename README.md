@@ -2,8 +2,8 @@
 
 Personal, cross-repository instructions for coding agents.
 
-`AGENTS.md` is the source of truth for these cross-agent preferences. Tool-specific instruction files should stay as
-thin forwarders so the same guidance is loaded everywhere.
+`AGENTS.md` and its referenced topic files are the source of truth for these cross-agent preferences. Tool-specific
+instruction files should stay as thin forwarders so the same guidance is loaded everywhere without copying it.
 
 ## Setup
 
@@ -53,10 +53,12 @@ Create the agent-specific forwarding files:
 
 ```sh
 mkdir -p ~/.codex ~/.claude ~/.gemini
-printf '@~/.agents/AGENTS.md\n' > ~/.codex/AGENTS.md
+printf '@~/.agents/AGENTS.md\n@~/.agents/instructions/subagents.md\n' > ~/.codex/AGENTS.md
 printf '@~/.agents/AGENTS.md\n' > ~/.claude/CLAUDE.md
 printf '@~/.agents/AGENTS.md\n' > ~/.gemini/GEMINI.md
 ```
+
+Add tool-specific guidance as another include rather than copying shared rules into the forwarding file.
 
 Use the same pattern for any other agent tool that supports `@` includes:
 
@@ -71,7 +73,7 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 
 ## Verify
 
-Check that each forwarding file contains exactly the global include:
+Check that each forwarding file references the global entry point:
 
 ```sh
 cat ~/.codex/AGENTS.md
@@ -79,7 +81,7 @@ cat ~/.claude/CLAUDE.md
 cat ~/.gemini/GEMINI.md
 ```
 
-Each command should print:
+Each command should include:
 
 ```text
 @~/.agents/AGENTS.md

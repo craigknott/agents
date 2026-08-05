@@ -4,8 +4,10 @@ Use when branching, staging, committing, pushing, creating pull requests, or add
 - Follow the repository's PR template and naming rules. When none exist, use
   `<ISSUEID|NOISSUE> - [<low|medium|high>] - <Title>`.
 - A fallback PR description should cover context, the change, validation, risk, and rollback.
-- For requested pushes, use `no-mistakes` by default unless the user or repository specifies another workflow. Follow
-  its installed skill or repository documentation, and initialize it only when needed for that push—not when unrelated
-  work begins.
+- For every requested Git push or pull-request delivery workflow, use `no-mistakes` as the default gate unless the user
+  or repository explicitly specifies another workflow. Treat its installed skill or repository documentation as the
+  canonical procedure; do not duplicate its mechanics here or bypass it with a direct push.
+- Initialize or run `no-mistakes` only when a push, pull-request delivery, or explicit validation request requires
+  it—not when unrelated repository work begins.
 
 Use `instructions/code-review.md` for risk classification.
