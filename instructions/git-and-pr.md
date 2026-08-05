@@ -1,6 +1,7 @@
 Use when branching, staging, committing, pushing, creating pull requests, or addressing PR feedback.
 
 - Follow repository conventions, keep commits focused, and stage only files that belong to the requested change.
+- Honor repository commit policies. When DCO is enforced, include a matching `Signed-off-by` trailer in every commit.
 - Follow the repository's PR template and naming rules. When none exist, use
   `<ISSUEID|NOISSUE> - [<low|medium|high>] - <Title>`.
 - A fallback PR description should cover context, the change, validation, risk, and rollback.
