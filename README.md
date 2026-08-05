@@ -33,8 +33,8 @@ Initialize `no-mistakes` only in repositories where you want to use its validati
 no-mistakes init
 ```
 
-The agent defaults use this gate for requested pushes unless the user or repository specifies another workflow; ordinary
-repository work does not trigger initialization.
+The agent defaults make this the canonical gate for requested Git pushes, pull-request delivery, and explicit validation
+unless the user or repository specifies another workflow; ordinary repository work does not trigger initialization.
 
 `no-mistakes init` also installs the `/no-mistakes` agent skill. From a supported coding agent, you can gate a task
 directly:
@@ -58,7 +58,7 @@ printf '@~/.agents/AGENTS.md\n' > ~/.claude/CLAUDE.md
 printf '@~/.agents/AGENTS.md\n' > ~/.gemini/GEMINI.md
 ```
 
-Add tool-specific guidance as another include rather than copying shared rules into the forwarding file.
+Add guidance that a tool must always load as another include rather than copying shared rules into the forwarding file.
 
 Use the same pattern for any other agent tool that supports `@` includes:
 

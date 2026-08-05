@@ -36,8 +36,7 @@ non-overlapping task instead of waiting unnecessarily.
 - Require concise summaries with file references and relevant failing lines, not raw logs or exploration transcripts.
 - The primary agent owns user intent, skill selection and instruction reading, integration, conflict resolution, final
   validation, and completion. Treat child output as evidence to verify, not as automatically accepted work.
-- Delegation does not reduce the completion standard: integrate and validate all accepted work, and fully finish the
-  requested task.
+- Delegation does not reduce the completion standard in `instructions/workflow.md`.
 
 ## Routing
 

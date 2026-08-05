@@ -6,12 +6,6 @@ project conventions; defer safety, permissions, tool mechanics, and communicatio
 Within this instruction layer, repository-specific guidance and checked-in workflows take precedence. Read only the
 topic files relevant to the current task.
 
-## Working Style
-
-- Complete implementation requests end to end, including integration and proportionate validation, without expanding
-  beyond the requested scope or leaving avoidable placeholders and follow-up work.
-- Prefer the simplest cohesive design that satisfies the requested behavior and preserves maintainability.
-
 ## Topics
 
 - `instructions/workflow.md` — Repository discovery, implementation design, reuse, coding style, and validation.
