@@ -18,7 +18,7 @@ codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific sub
 
 test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
 grep -Fq 'Ordinary delegations must use `fork_turns="none"`' "${repo_root}/codex/AGENTS.md"
-test "$(grep -Ec '^\| `?(explorer|worker|docs_researcher|bulk_scout|reviewer)`? \|' "${repo_root}/codex/AGENTS.md")" -eq 5
+test "$(grep -Ec '^\| [^|]+ \| `(explorer|worker|docs_researcher|bulk_scout|reviewer)` \|' "${repo_root}/codex/AGENTS.md")" -eq 5
 test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
 test "$(grep -Ec 'fork_turns|gpt-5\.6-|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
 
@@ -98,4 +98,30 @@ test "${override_state_after_repeat}" = "${override_state_before_repeat}"
 test "$(grep -Fxc "${shared_loader}" "${override_home}/AGENTS.override.md")" -eq 1
 test "$(grep -Fxc "${codex_loader}" "${override_home}/AGENTS.override.md")" -eq 1
 
-printf '%s\n' 'Installer checks passed for AGENTS.md fallback and AGENTS.override.md precedence.'
+default_home="${test_root}/default-user-home"
+mkdir -p "${default_home}"
+
+(
+  unset CODEX_HOME
+  HOME="${default_home}" "${repo_root}/scripts/install-codex.sh"
+) >"${test_root}/default-first.txt"
+
+default_codex_home="${default_home}/.codex"
+for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
+  cmp "${repo_root}/codex/agents/${agent_name}.toml" "${default_codex_home}/agents/${agent_name}.toml"
+done
+
+test "$(grep -Fxc "${shared_loader}" "${default_codex_home}/AGENTS.md")" -eq 1
+test "$(grep -Fxc "${codex_loader}" "${default_codex_home}/AGENTS.md")" -eq 1
+test ! -e "${default_codex_home}/config.toml"
+
+default_state_before_repeat=$(find "${default_codex_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
+(
+  unset CODEX_HOME
+  HOME="${default_home}" "${repo_root}/scripts/install-codex.sh"
+) >"${test_root}/default-second.txt"
+default_state_after_repeat=$(find "${default_codex_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
+
+test "${default_state_after_repeat}" = "${default_state_before_repeat}"
+
+printf '%s\n' 'Installer checks passed for the default home, AGENTS.md fallback, and AGENTS.override.md precedence.'
