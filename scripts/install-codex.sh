@@ -29,8 +29,8 @@ ensure_include() {
   fi
 }
 
-ensure_include '@~/.agents/AGENTS.md'
-ensure_include '@~/.agents/instructions/subagents.md'
+ensure_include 'Read and follow `~/.agents/AGENTS.md` as the global instruction entry point.'
+ensure_include 'Before delegating work, read and follow `~/.agents/instructions/subagents.md`; ordinary delegations use `fork_turns="none"` as specified there.'
 
 printf 'Installed five Codex agents in %s\n' "${codex_agents_dir}"
-printf 'Updated Codex instruction includes in %s\n' "${codex_instructions_file}"
+printf 'Updated Codex instruction directives in %s\n' "${codex_instructions_file}"

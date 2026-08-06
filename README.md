@@ -55,7 +55,8 @@ Install the shared Codex subagent definitions and instruction forwarders:
 ~/.agents/scripts/install-codex.sh
 ```
 
-The installer copies these portable definitions into `~/.codex/agents/`:
+The installer uses `$CODEX_HOME` when set and otherwise defaults to `~/.codex`. It copies these portable definitions
+into that Codex home's `agents/` directory:
 
 | Agent | Purpose | Default configuration |
 | --- | --- | --- |
@@ -65,12 +66,13 @@ The installer copies these portable definitions into `~/.codex/agents/`:
 | `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-5.6-terra`, medium, read-only |
 | `reviewer` | Correctness, security, regression, and test review | `gpt-5.6-sol`, high, read-only |
 
-It preserves other files in `~/.codex/agents/`, appends missing shared-instruction includes to `~/.codex/AGENTS.md`,
-and does not read or modify `~/.codex/config.toml`. The pack contains no credentials. Configure Context7 separately in
-your own Codex configuration if `docs_researcher` should use it; the agent inherits that server configuration.
+It preserves other files in `agents/`, appends missing shared-instruction loader directives to `AGENTS.md`, and does not
+read or modify `config.toml` in that Codex home. The pack contains no credentials. Configure Context7 separately in your
+own Codex configuration if `docs_researcher` should use it; the agent inherits that server configuration.
 
 Current Codex releases enable subagents by default. To reproduce this repository's bounded child defaults and
-three-child cap, merge the following settings into `~/.codex/config.toml` without duplicating an existing table:
+three-child cap, merge the following settings into the selected Codex home's `config.toml` (normally
+`~/.codex/config.toml`) without duplicating an existing table:
 
 ```toml
 [agents]
@@ -82,7 +84,7 @@ interrupt_message = true
 
 [features]
 multi_agent = true
-multi_agent_v2 = false
+multi_agent_v2 = true
 ```
 
 `fork_turns` is selected at spawn time rather than in `config.toml`. The shared subagent instructions direct agents to
@@ -107,13 +109,13 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 ## Repository Files
 
 - `AGENTS.md` - global entry point and router for topic-specific instructions.
-- `codex/agents/` - portable custom-agent definitions installed into `~/.codex/agents/`.
+- `codex/agents/` - portable custom-agent definitions installed into the selected Codex home's `agents/` directory.
 - `instructions/` - focused guidance loaded only when the task matches the topic.
 - `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
 
 ## Verify
 
-Check that each forwarding file references the global entry point:
+With the default Codex home, check that each forwarding file references the global entry point:
 
 ```sh
 cat ~/.codex/AGENTS.md
@@ -124,8 +126,11 @@ cat ~/.gemini/GEMINI.md
 Each command should include:
 
 ```text
-@~/.agents/AGENTS.md
+~/.agents/AGENTS.md
 ```
+
+Codex's file should also direct ordinary delegations to use `fork_turns="none"` through the shared subagent
+instructions.
 
 Confirm that Codex can discover the shared roles:
 
