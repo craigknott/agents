@@ -23,7 +23,7 @@ printf '%s\n' 'model = "sentinel-model"' >"${codex_home}/config.toml"
 config_before=$(cksum "${codex_home}/config.toml")
 unrelated_before=$(cksum "${codex_home}/agents/unrelated.toml")
 
-test "$(grep -Fxc 'multi_agent_v2 = true' "${repo_root}/README.md")" -eq 1
+test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
 grep -Fq 'Use `fork_turns="none"`' "${repo_root}/instructions/subagents.md"
 
 CODEX_HOME="${codex_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/first-install.txt"

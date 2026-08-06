@@ -84,7 +84,7 @@ interrupt_message = true
 
 [features]
 multi_agent = true
-multi_agent_v2 = true
+multi_agent_v2 = false
 ```
 
 `fork_turns` is selected at spawn time rather than in `config.toml`. The shared subagent instructions direct agents to
