@@ -1,3 +1,6 @@
+@~/.agents/AGENTS.md
+@~/.agents/instructions/subagents.md
+
 # Codex Subagent Defaults
 
 Apply these Codex-specific rules together with the shared delegation guidance in

@@ -13,10 +13,11 @@ else
   trap 'rm -rf "${test_root}"' EXIT HUP INT TERM
 fi
 
-shared_loader='Read and follow `~/.agents/AGENTS.md` as the shared global instruction entry point.'
 codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
 
 test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
+test "$(grep -Fxc '@~/.agents/AGENTS.md' "${repo_root}/codex/AGENTS.md")" -eq 1
+test "$(grep -Fxc '@~/.agents/instructions/subagents.md' "${repo_root}/codex/AGENTS.md")" -eq 1
 grep -Fq 'Ordinary delegations must use `fork_turns="none"`' "${repo_root}/codex/AGENTS.md"
 test "$(grep -Ec '^\| [^|]+ \| `(explorer|worker|docs_researcher|bulk_scout|reviewer)` \|' "${repo_root}/codex/AGENTS.md")" -eq 5
 test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
@@ -52,7 +53,6 @@ for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
 done
 
 grep -Fq '# Keep this fallback instruction.' "${fallback_home}/AGENTS.md"
-test "$(grep -Fxc "${shared_loader}" "${fallback_home}/AGENTS.md")" -eq 1
 test "$(grep -Fxc "${codex_loader}" "${fallback_home}/AGENTS.md")" -eq 1
 test "$(cksum "${fallback_home}/AGENTS.override.md")" = "${fallback_override_before}"
 test "$(cksum "${fallback_home}/config.toml")" = "${fallback_config_before}"
@@ -63,7 +63,6 @@ CODEX_HOME="${fallback_home}" "${repo_root}/scripts/install-codex.sh" >"${test_r
 fallback_state_after_repeat=$(find "${fallback_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
 
 test "${fallback_state_after_repeat}" = "${fallback_state_before_repeat}"
-test "$(grep -Fxc "${shared_loader}" "${fallback_home}/AGENTS.md")" -eq 1
 test "$(grep -Fxc "${codex_loader}" "${fallback_home}/AGENTS.md")" -eq 1
 
 override_home="${test_root}/override-home"
@@ -84,7 +83,6 @@ for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
 done
 
 grep -Fq '# Keep this active override.' "${override_home}/AGENTS.override.md"
-test "$(grep -Fxc "${shared_loader}" "${override_home}/AGENTS.override.md")" -eq 1
 test "$(grep -Fxc "${codex_loader}" "${override_home}/AGENTS.override.md")" -eq 1
 test "$(cksum "${override_home}/AGENTS.md")" = "${override_agents_before}"
 test "$(cksum "${override_home}/config.toml")" = "${override_config_before}"
@@ -95,7 +93,6 @@ CODEX_HOME="${override_home}" "${repo_root}/scripts/install-codex.sh" >"${test_r
 override_state_after_repeat=$(find "${override_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
 
 test "${override_state_after_repeat}" = "${override_state_before_repeat}"
-test "$(grep -Fxc "${shared_loader}" "${override_home}/AGENTS.override.md")" -eq 1
 test "$(grep -Fxc "${codex_loader}" "${override_home}/AGENTS.override.md")" -eq 1
 
 default_home="${test_root}/default-user-home"
@@ -111,7 +108,6 @@ for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
   cmp "${repo_root}/codex/agents/${agent_name}.toml" "${default_codex_home}/agents/${agent_name}.toml"
 done
 
-test "$(grep -Fxc "${shared_loader}" "${default_codex_home}/AGENTS.md")" -eq 1
 test "$(grep -Fxc "${codex_loader}" "${default_codex_home}/AGENTS.md")" -eq 1
 test ! -e "${default_codex_home}/config.toml"
 

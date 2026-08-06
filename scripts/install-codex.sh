@@ -34,7 +34,6 @@ ensure_include() {
   fi
 }
 
-ensure_include 'Read and follow `~/.agents/AGENTS.md` as the shared global instruction entry point.'
 ensure_include 'Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
 
 printf 'Installed five Codex agents in %s\n' "${codex_agents_dir}"

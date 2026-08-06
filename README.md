@@ -68,9 +68,10 @@ into that Codex home's `agents/` directory:
 
 It preserves other files in `agents/` and follows Codex's global instruction precedence: when the selected home has a
 non-empty `AGENTS.override.md`, it appends missing loader directives there; otherwise it preserves or creates
-`AGENTS.md`. Those directives load both `~/.agents/AGENTS.md` and the Codex-specific `~/.agents/codex/AGENTS.md` without
-copying their contents. The installer does not read or modify `config.toml` in that Codex home. The pack contains no
-credentials. Configure Context7 separately in your own Codex configuration if `docs_researcher` should use it; the
+`AGENTS.md`. The installed directive loads `~/.agents/codex/AGENTS.md`, whose opening references mirror the portable
+parts of a normal Codex forwarder: `~/.agents/AGENTS.md` and `~/.agents/instructions/subagents.md`, followed by the
+Codex-specific routing rules. The installer does not read or modify `config.toml` in that Codex home. The pack contains
+no credentials. Configure Context7 separately in your own Codex configuration if `docs_researcher` should use it; the
 agent inherits that server configuration.
 
 Current Codex releases enable subagents by default. To reproduce this repository's bounded child defaults and
@@ -112,7 +113,7 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 ## Repository Files
 
 - `AGENTS.md` - global entry point and router for topic-specific instructions.
-- `codex/AGENTS.md` - Codex-specific role routing, model selection, and bounded-context guidance.
+- `codex/AGENTS.md` - portable Codex forwarder references plus Codex-specific role routing and bounded-context guidance.
 - `codex/agents/` - portable custom-agent definitions installed into the selected Codex home's `agents/` directory.
 - `instructions/` - focused guidance loaded only when the task matches the topic.
 - `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
@@ -131,14 +132,15 @@ cat ~/.claude/CLAUDE.md
 cat ~/.gemini/GEMINI.md
 ```
 
-Each forwarding file should include the shared entry point:
+The Codex active file should load:
 
 ```text
-~/.agents/AGENTS.md
+~/.agents/codex/AGENTS.md
 ```
 
-Codex's active file should also load `~/.agents/codex/AGENTS.md`, which directs ordinary delegations to use
-`fork_turns="none"`.
+That file begins with references to `~/.agents/AGENTS.md` and `~/.agents/instructions/subagents.md`, then directs
+ordinary Codex delegations to use `fork_turns="none"`. Other tool forwarders should include the shared
+`~/.agents/AGENTS.md` entry point.
 
 Confirm that Codex can discover the shared roles:
 
