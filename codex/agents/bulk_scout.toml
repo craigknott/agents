@@ -1,0 +1,23 @@
+name = "bulk_scout"
+description = "Read-only high-volume scanner for large files, logs, and repository partitions."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+web_search = "disabled"
+include_apps_instructions = false
+developer_instructions = """
+Scan only the assigned files, logs, or repository partition.
+Collect evidence at high volume, deduplicate it, and return a concise summary with file and line references.
+Do not edit files, make final design decisions, use external integrations, paste raw scans, or delegate work.
+"""
+
+[features]
+apps = false
+browser_use = false
+computer_use = false
+image_generation = false
+in_app_browser = false
+multi_agent = false
+plugins = false
+remote_plugin = false
+tool_suggest = false

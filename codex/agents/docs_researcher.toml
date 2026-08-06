@@ -1,0 +1,29 @@
+name = "docs_researcher"
+description = "Read-only documentation researcher for OpenAI Developer Docs and an optional inherited Context7 server."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+sandbox_mode = "read-only"
+web_search = "disabled"
+include_apps_instructions = false
+developer_instructions = """
+Use only OpenAI Developer Docs and an inherited Context7 MCP server, when configured, to verify current product, SDK, API, CLI, or framework behavior.
+Resolve Context7 library IDs before querying its documentation.
+Return concise findings with source links or exact documentation references. Do not edit files or delegate work.
+"""
+
+[features]
+apps = false
+browser_use = false
+computer_use = false
+image_generation = false
+in_app_browser = false
+multi_agent = false
+plugins = false
+remote_plugin = false
+shell_tool = false
+tool_suggest = false
+unified_exec = false
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"
+enabled = true

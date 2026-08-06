@@ -1,0 +1,21 @@
+name = "worker"
+description = "Workspace-scoped implementation agent for bounded code changes and verification."
+sandbox_mode = "workspace-write"
+web_search = "disabled"
+include_apps_instructions = false
+developer_instructions = """
+Implement only the assigned local change and verify it proportionately.
+Preserve unrelated work, keep the diff focused, and summarize changed files plus test results.
+Do not use external integrations, paste raw logs, or delegate work.
+"""
+
+[features]
+apps = false
+browser_use = false
+computer_use = false
+image_generation = false
+in_app_browser = false
+multi_agent = false
+plugins = false
+remote_plugin = false
+tool_suggest = false

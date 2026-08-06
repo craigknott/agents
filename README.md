@@ -49,11 +49,49 @@ Or validate already committed branch work:
 /no-mistakes
 ```
 
-Create the agent-specific forwarding files:
+Install the shared Codex subagent definitions and instruction forwarders:
 
 ```sh
-mkdir -p ~/.codex ~/.claude ~/.gemini
-printf '@~/.agents/AGENTS.md\n@~/.agents/instructions/subagents.md\n' > ~/.codex/AGENTS.md
+~/.agents/scripts/install-codex.sh
+```
+
+The installer copies these portable definitions into `~/.codex/agents/`:
+
+| Agent | Purpose | Default configuration |
+| --- | --- | --- |
+| `explorer` | Targeted repository exploration | Read-only; inherits the configured child model and effort |
+| `worker` | Bounded implementation and verification | Workspace-write; inherits the configured child model and effort |
+| `docs_researcher` | OpenAI Docs and optional Context7 research | `gpt-5.6-sol`, medium, read-only |
+| `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-5.6-terra`, medium, read-only |
+| `reviewer` | Correctness, security, regression, and test review | `gpt-5.6-sol`, high, read-only |
+
+It preserves other files in `~/.codex/agents/`, appends missing shared-instruction includes to `~/.codex/AGENTS.md`,
+and does not read or modify `~/.codex/config.toml`. The pack contains no credentials. Configure Context7 separately in
+your own Codex configuration if `docs_researcher` should use it; the agent inherits that server configuration.
+
+Current Codex releases enable subagents by default. To reproduce this repository's bounded child defaults and
+three-child cap, merge the following settings into `~/.codex/config.toml` without duplicating an existing table:
+
+```toml
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 3
+default_subagent_model = "gpt-5.6-sol"
+default_subagent_reasoning_effort = "medium"
+interrupt_message = true
+
+[features]
+multi_agent = true
+multi_agent_v2 = false
+```
+
+`fork_turns` is selected at spawn time rather than in `config.toml`. The shared subagent instructions direct agents to
+pass `fork_turns="none"` for ordinary delegation and provide a self-contained task capsule.
+
+For other agent tools, create their forwarding files separately:
+
+```sh
+mkdir -p ~/.claude ~/.gemini
 printf '@~/.agents/AGENTS.md\n' > ~/.claude/CLAUDE.md
 printf '@~/.agents/AGENTS.md\n' > ~/.gemini/GEMINI.md
 ```
@@ -69,7 +107,9 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 ## Repository Files
 
 - `AGENTS.md` - global entry point and router for topic-specific instructions.
+- `codex/agents/` - portable custom-agent definitions installed into `~/.codex/agents/`.
 - `instructions/` - focused guidance loaded only when the task matches the topic.
+- `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
 
 ## Verify
 
@@ -85,6 +125,12 @@ Each command should include:
 
 ```text
 @~/.agents/AGENTS.md
+```
+
+Confirm that Codex can discover the shared roles:
+
+```sh
+ls ~/.codex/agents/{explorer,worker,docs_researcher,bulk_scout,reviewer}.toml
 ```
 
 Check that `no-mistakes` prerequisites are available:

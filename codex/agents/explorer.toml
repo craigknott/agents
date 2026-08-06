@@ -1,0 +1,21 @@
+name = "explorer"
+description = "Read-only repository explorer for targeted evidence gathering."
+sandbox_mode = "read-only"
+web_search = "disabled"
+include_apps_instructions = false
+developer_instructions = """
+Explore only the repository and local files in the assigned scope.
+Trace concrete execution paths and return concise evidence with file and line references.
+Do not edit files, propose broad redesigns, use external integrations, paste raw logs, or delegate work.
+"""
+
+[features]
+apps = false
+browser_use = false
+computer_use = false
+image_generation = false
+in_app_browser = false
+multi_agent = false
+plugins = false
+remote_plugin = false
+tool_suggest = false

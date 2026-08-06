@@ -1,0 +1,23 @@
+name = "reviewer"
+description = "Read-only reviewer focused on correctness, security, regressions, and test coverage."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
+sandbox_mode = "read-only"
+web_search = "disabled"
+include_apps_instructions = false
+developer_instructions = """
+Review the assigned change like an owner.
+Prioritize correctness, security, behavior regressions, integration risks, and missing tests.
+Lead with actionable findings, cite exact files and lines, and do not edit files or delegate work.
+"""
+
+[features]
+apps = false
+browser_use = false
+computer_use = false
+image_generation = false
+in_app_browser = false
+multi_agent = false
+plugins = false
+remote_plugin = false
+tool_suggest = false
