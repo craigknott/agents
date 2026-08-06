@@ -13,47 +13,89 @@ else
   trap 'rm -rf "${test_root}"' EXIT HUP INT TERM
 fi
 
-codex_home="${test_root}/codex-home"
-mkdir -p "${codex_home}/agents"
-
-printf '%s\n' 'name = "unrelated"' >"${codex_home}/agents/unrelated.toml"
-printf '%s\n' '# Keep this local instruction.' >"${codex_home}/AGENTS.md"
-printf '%s\n' 'model = "sentinel-model"' >"${codex_home}/config.toml"
-
-config_before=$(cksum "${codex_home}/config.toml")
-unrelated_before=$(cksum "${codex_home}/agents/unrelated.toml")
+shared_loader='Read and follow `~/.agents/AGENTS.md` as the shared global instruction entry point.'
+codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
 
 test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
-grep -Fq 'Use `fork_turns="none"`' "${repo_root}/instructions/subagents.md"
+grep -Fq 'Ordinary delegations must use `fork_turns="none"`' "${repo_root}/codex/AGENTS.md"
+test "$(grep -Ec '^\| `?(explorer|worker|docs_researcher|bulk_scout|reviewer)`? \|' "${repo_root}/codex/AGENTS.md")" -eq 5
+test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
+test "$(grep -Ec 'fork_turns|gpt-5\.6-|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
 
-CODEX_HOME="${codex_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/first-install.txt"
+portable_files="${repo_root}/codex/AGENTS.md ${repo_root}/codex/agents/explorer.toml ${repo_root}/codex/agents/worker.toml ${repo_root}/codex/agents/docs_researcher.toml ${repo_root}/codex/agents/bulk_scout.toml ${repo_root}/codex/agents/reviewer.toml ${repo_root}/scripts/install-codex.sh"
+
+if grep -En '/Users/|/home/|[A-Za-z]:\\Users\\' ${portable_files}; then
+  printf '%s\n' 'Machine-local path found in portable Codex files' >&2
+  exit 1
+fi
+
+if grep -En 'sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|://[^/@[:space:]]+:[^/@[:space:]]+@' ${portable_files}; then
+  printf '%s\n' 'Possible secret found in portable Codex files' >&2
+  exit 1
+fi
+
+fallback_home="${test_root}/fallback-home"
+mkdir -p "${fallback_home}/agents"
+printf '%s\n' 'name = "unrelated-fallback"' >"${fallback_home}/agents/unrelated.toml"
+printf '%s\n' '# Keep this fallback instruction.' >"${fallback_home}/AGENTS.md"
+: >"${fallback_home}/AGENTS.override.md"
+printf '%s\n' 'model = "fallback-sentinel"' >"${fallback_home}/config.toml"
+
+fallback_config_before=$(cksum "${fallback_home}/config.toml")
+fallback_unrelated_before=$(cksum "${fallback_home}/agents/unrelated.toml")
+fallback_override_before=$(cksum "${fallback_home}/AGENTS.override.md")
+
+CODEX_HOME="${fallback_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/fallback-first.txt"
 
 for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
-  cmp "${repo_root}/codex/agents/${agent_name}.toml" "${codex_home}/agents/${agent_name}.toml"
+  cmp "${repo_root}/codex/agents/${agent_name}.toml" "${fallback_home}/agents/${agent_name}.toml"
 done
 
-test "$(grep -Fxc 'Read and follow `~/.agents/AGENTS.md` as the global instruction entry point.' "${codex_home}/AGENTS.md")" -eq 1
-test "$(grep -Fxc 'Before delegating work, read and follow `~/.agents/instructions/subagents.md`; ordinary delegations use `fork_turns="none"` as specified there.' "${codex_home}/AGENTS.md")" -eq 1
-test "$(cksum "${codex_home}/config.toml")" = "${config_before}"
-test "$(cksum "${codex_home}/agents/unrelated.toml")" = "${unrelated_before}"
+grep -Fq '# Keep this fallback instruction.' "${fallback_home}/AGENTS.md"
+test "$(grep -Fxc "${shared_loader}" "${fallback_home}/AGENTS.md")" -eq 1
+test "$(grep -Fxc "${codex_loader}" "${fallback_home}/AGENTS.md")" -eq 1
+test "$(cksum "${fallback_home}/AGENTS.override.md")" = "${fallback_override_before}"
+test "$(cksum "${fallback_home}/config.toml")" = "${fallback_config_before}"
+test "$(cksum "${fallback_home}/agents/unrelated.toml")" = "${fallback_unrelated_before}"
 
-state_before_repeat=$(find "${codex_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
-CODEX_HOME="${codex_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/second-install.txt"
-state_after_repeat=$(find "${codex_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
+fallback_state_before_repeat=$(find "${fallback_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
+CODEX_HOME="${fallback_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/fallback-second.txt"
+fallback_state_after_repeat=$(find "${fallback_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
 
-test "${state_after_repeat}" = "${state_before_repeat}"
-test "$(grep -Fxc 'Read and follow `~/.agents/AGENTS.md` as the global instruction entry point.' "${codex_home}/AGENTS.md")" -eq 1
-test "$(grep -Fxc 'Before delegating work, read and follow `~/.agents/instructions/subagents.md`; ordinary delegations use `fork_turns="none"` as specified there.' "${codex_home}/AGENTS.md")" -eq 1
+test "${fallback_state_after_repeat}" = "${fallback_state_before_repeat}"
+test "$(grep -Fxc "${shared_loader}" "${fallback_home}/AGENTS.md")" -eq 1
+test "$(grep -Fxc "${codex_loader}" "${fallback_home}/AGENTS.md")" -eq 1
 
-report_file="${test_root}/installer-evidence.txt"
-{
-  printf '%s\n' 'Installer end-to-end checks passed:'
-  sed 's/^/  first run: /' "${test_root}/first-install.txt"
-  sed 's/^/  second run: /' "${test_root}/second-install.txt"
-  printf '%s\n' '  installed roles: explorer, worker, docs_researcher, bulk_scout, reviewer'
-  printf '%s\n' '  delegation default: shared instructions require fork_turns="none"'
-  printf '%s\n' '  preserved: existing AGENTS.md content, unrelated.toml, config.toml'
-  printf '%s\n' '  repeatability: second run left installed state unchanged'
-} >"${report_file}"
+override_home="${test_root}/override-home"
+mkdir -p "${override_home}/agents"
+printf '%s\n' 'name = "unrelated-override"' >"${override_home}/agents/unrelated.toml"
+printf '%s\n' '# Keep this inactive instruction.' >"${override_home}/AGENTS.md"
+printf '%s\n' '# Keep this active override.' >"${override_home}/AGENTS.override.md"
+printf '%s\n' 'model = "override-sentinel"' >"${override_home}/config.toml"
 
-sed -n '1,20p' "${report_file}"
+override_config_before=$(cksum "${override_home}/config.toml")
+override_unrelated_before=$(cksum "${override_home}/agents/unrelated.toml")
+override_agents_before=$(cksum "${override_home}/AGENTS.md")
+
+CODEX_HOME="${override_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/override-first.txt"
+
+for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
+  cmp "${repo_root}/codex/agents/${agent_name}.toml" "${override_home}/agents/${agent_name}.toml"
+done
+
+grep -Fq '# Keep this active override.' "${override_home}/AGENTS.override.md"
+test "$(grep -Fxc "${shared_loader}" "${override_home}/AGENTS.override.md")" -eq 1
+test "$(grep -Fxc "${codex_loader}" "${override_home}/AGENTS.override.md")" -eq 1
+test "$(cksum "${override_home}/AGENTS.md")" = "${override_agents_before}"
+test "$(cksum "${override_home}/config.toml")" = "${override_config_before}"
+test "$(cksum "${override_home}/agents/unrelated.toml")" = "${override_unrelated_before}"
+
+override_state_before_repeat=$(find "${override_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
+CODEX_HOME="${override_home}" "${repo_root}/scripts/install-codex.sh" >"${test_root}/override-second.txt"
+override_state_after_repeat=$(find "${override_home}" -type f -exec cksum {} \; | LC_ALL=C sort)
+
+test "${override_state_after_repeat}" = "${override_state_before_repeat}"
+test "$(grep -Fxc "${shared_loader}" "${override_home}/AGENTS.override.md")" -eq 1
+test "$(grep -Fxc "${codex_loader}" "${override_home}/AGENTS.override.md")" -eq 1
+
+printf '%s\n' 'Installer checks passed for AGENTS.md fallback and AGENTS.override.md precedence.'

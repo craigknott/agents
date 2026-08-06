@@ -66,9 +66,12 @@ into that Codex home's `agents/` directory:
 | `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-5.6-terra`, medium, read-only |
 | `reviewer` | Correctness, security, regression, and test review | `gpt-5.6-sol`, high, read-only |
 
-It preserves other files in `agents/`, appends missing shared-instruction loader directives to `AGENTS.md`, and does not
-read or modify `config.toml` in that Codex home. The pack contains no credentials. Configure Context7 separately in your
-own Codex configuration if `docs_researcher` should use it; the agent inherits that server configuration.
+It preserves other files in `agents/` and follows Codex's global instruction precedence: when the selected home has a
+non-empty `AGENTS.override.md`, it appends missing loader directives there; otherwise it preserves or creates
+`AGENTS.md`. Those directives load both `~/.agents/AGENTS.md` and the Codex-specific `~/.agents/codex/AGENTS.md` without
+copying their contents. The installer does not read or modify `config.toml` in that Codex home. The pack contains no
+credentials. Configure Context7 separately in your own Codex configuration if `docs_researcher` should use it; the
+agent inherits that server configuration.
 
 Current Codex releases enable subagents by default. To reproduce this repository's bounded child defaults and
 three-child cap, merge the following settings into the selected Codex home's `config.toml` (normally
@@ -87,7 +90,7 @@ multi_agent = true
 multi_agent_v2 = false
 ```
 
-`fork_turns` is selected at spawn time rather than in `config.toml`. The shared subagent instructions direct agents to
+`fork_turns` is selected at spawn time rather than in `config.toml`. The Codex-specific instructions direct agents to
 pass `fork_turns="none"` for ordinary delegation and provide a self-contained task capsule.
 
 For other agent tools, create their forwarding files separately:
@@ -109,28 +112,33 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 ## Repository Files
 
 - `AGENTS.md` - global entry point and router for topic-specific instructions.
+- `codex/AGENTS.md` - Codex-specific role routing, model selection, and bounded-context guidance.
 - `codex/agents/` - portable custom-agent definitions installed into the selected Codex home's `agents/` directory.
 - `instructions/` - focused guidance loaded only when the task matches the topic.
 - `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
 
 ## Verify
 
-With the default Codex home, check that each forwarding file references the global entry point:
+With the default Codex home, inspect the active Codex global instruction file and the other forwarding files:
 
 ```sh
-cat ~/.codex/AGENTS.md
+if [ -s ~/.codex/AGENTS.override.md ]; then
+  cat ~/.codex/AGENTS.override.md
+else
+  cat ~/.codex/AGENTS.md
+fi
 cat ~/.claude/CLAUDE.md
 cat ~/.gemini/GEMINI.md
 ```
 
-Each command should include:
+Each forwarding file should include the shared entry point:
 
 ```text
 ~/.agents/AGENTS.md
 ```
 
-Codex's file should also direct ordinary delegations to use `fork_turns="none"` through the shared subagent
-instructions.
+Codex's active file should also load `~/.agents/codex/AGENTS.md`, which directs ordinary delegations to use
+`fork_turns="none"`.
 
 Confirm that Codex can discover the shared roles:
 

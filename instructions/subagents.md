@@ -31,26 +31,7 @@ non-overlapping task instead of waiting unnecessarily.
 - Assign non-overlapping responsibilities and, for implementation, non-overlapping file ownership whenever practical.
   Do not ask multiple agents to perform the same scan or edit the same files unless an independent comparison is the
   explicit purpose.
-- Default to the smallest useful context. Use `fork_turns="none"`; use `"2"` only when the latest clarification or
-  failure is essential, and `"all"` only when the complete decision history is indispensable.
 - Require concise summaries with file references and relevant failing lines, not raw logs or exploration transcripts.
 - The primary agent owns user intent, skill selection and instruction reading, integration, conflict resolution, final
   validation, and completion. Treat child output as evidence to verify, not as automatically accepted work.
 - Delegation does not reduce the completion standard in `instructions/workflow.md`.
-
-## Routing
-
-Use these defaults when the active tool exposes the corresponding roles and model controls:
-
-| Task | Role | Model and effort | `fork_turns` |
-| --- | --- | --- | --- |
-| Simple exploration | `explorer` | `gpt-5.6-sol`, `medium` | `"none"` |
-| Simple implementation | `worker` | `gpt-5.6-sol`, `medium` | `"none"` |
-| Documentation research | `docs_researcher` | `gpt-5.6-sol`, `medium` | `"none"` |
-| Large-file, log, or repository partition scan | `bulk_scout` | `gpt-5.6-terra`, `medium` | `"none"` |
-| Review, subtle debugging, or integration analysis | `reviewer` | `gpt-5.6-sol`, `high` | `"none"` or `"2"` |
-| Complex or high-risk implementation | Primary, or one bounded child | `gpt-5.6-sol`, `xhigh` | `"none"` or `"2"` |
-| Full decision-history dependency | Inherited/default | Inherit parent model and effort | `"all"` (rare) |
-
-If custom roles are unavailable, reproduce the role's responsibility in the task capsule and use explicit model and
-reasoning settings when the tool supports them. Do not assume all surfaces provide identical bounded-history behavior.
