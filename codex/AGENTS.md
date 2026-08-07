@@ -1,4 +1,6 @@
 @~/.agents/AGENTS.md
+@~/.agents/codex/RTK.md
+@~/.agents/instructions/research.md
 @~/.agents/instructions/subagents.md
 
 # Codex Subagent Defaults
