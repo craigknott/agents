@@ -9,6 +9,8 @@ Use when branching, staging, committing, pushing, creating pull requests, or add
   If DCO fails, repair the commit history instead of adding a file-only follow-up: amend or rebase every unsigned
   commit with the matching sign-off. A later signed commit does not remediate an earlier unsigned commit, and a
   cryptographic commit signature does not replace this trailer.
+  A phase assigned to fix DCO must return a clean, fully signed pull-request commit range instead of relying on an
+  outer workflow to turn uncommitted changes into another unsigned fix commit.
 - Follow the repository's PR template and naming rules. When none exist, use
   `<ISSUEID|NOISSUE> - [<low|medium|high>] - <Title>`.
 - A fallback PR description should cover context, the change, validation, risk, and rollback.
