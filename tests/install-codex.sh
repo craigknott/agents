@@ -26,14 +26,21 @@ test "$(grep -Ec '^\| [^|]+ \| `(explorer|worker|docs_researcher|bulk_scout|revi
 test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
 test "$(grep -Ec 'fork_turns|gpt-5\.6-|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
 
-portable_files="${repo_root}/codex/AGENTS.md ${repo_root}/codex/agents/explorer.toml ${repo_root}/codex/agents/worker.toml ${repo_root}/codex/agents/docs_researcher.toml ${repo_root}/codex/agents/bulk_scout.toml ${repo_root}/codex/agents/reviewer.toml ${repo_root}/scripts/install-codex.sh"
+set -- \
+  "${repo_root}/codex/AGENTS.md" \
+  "${repo_root}/codex/agents/explorer.toml" \
+  "${repo_root}/codex/agents/worker.toml" \
+  "${repo_root}/codex/agents/docs_researcher.toml" \
+  "${repo_root}/codex/agents/bulk_scout.toml" \
+  "${repo_root}/codex/agents/reviewer.toml" \
+  "${repo_root}/scripts/install-codex.sh"
 
-if grep -En '/Users/|/home/|[A-Za-z]:\\Users\\' ${portable_files}; then
+if grep -En '/Users/|/home/|[A-Za-z]:\\Users\\' "$@"; then
   printf '%s\n' 'Machine-local path found in portable Codex files' >&2
   exit 1
 fi
 
-if grep -En 'sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|://[^/@[:space:]]+:[^/@[:space:]]+@' ${portable_files}; then
+if grep -En 'sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|://[^/@[:space:]]+:[^/@[:space:]]+@' "$@"; then
   printf '%s\n' 'Possible secret found in portable Codex files' >&2
   exit 1
 fi
