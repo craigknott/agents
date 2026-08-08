@@ -9,7 +9,7 @@ topic files relevant to the current task.
 ## Topics
 
 - `instructions/workflow.md` — Repository discovery, implementation design, reuse, coding style, and validation.
-- `instructions/subagents.md` — Read before delegating: permission, decision criteria, routing, scoping, and
+- `instructions/subagents.md` — Read before delegating: permission, decision criteria, scoping, and
   integration.
 - `instructions/package-managers.md` — Package-manager selection and dependency changes.
 - `instructions/code-review.md` — Reviews, findings, and risk classification.
