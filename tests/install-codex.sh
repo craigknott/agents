@@ -17,17 +17,16 @@ codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific sub
 
 test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
 test "$(grep -Fxc '@~/.agents/AGENTS.md' "${repo_root}/codex/AGENTS.md")" -eq 1
-test "$(grep -Fxc '@~/.agents/codex/RTK.md' "${repo_root}/codex/AGENTS.md")" -eq 1
-test "$(grep -Fxc '@~/.agents/instructions/research.md' "${repo_root}/codex/AGENTS.md")" -eq 1
-test "$(grep -Fxc '@~/.agents/instructions/subagents.md' "${repo_root}/codex/AGENTS.md")" -eq 1
-grep -Fq 'Always prefix shell commands with `rtk`.' "${repo_root}/codex/RTK.md"
-grep -Fq 'use Context7 when available' "${repo_root}/instructions/research.md"
+test "$(grep -Fxc '@~/.codex/RTK.md' "${repo_root}/codex/AGENTS.md")" -eq 1
+test "$(grep -Ec '^@' "${repo_root}/codex/AGENTS.md")" -eq 2
+test "$(grep -Fxc '@~/.agents/instructions/research.md' "${repo_root}/codex/AGENTS.md")" -eq 0
+test "$(grep -Fxc '@~/.agents/instructions/subagents.md' "${repo_root}/codex/AGENTS.md")" -eq 0
 grep -Fq 'Ordinary delegations must use `fork_turns="none"`' "${repo_root}/codex/AGENTS.md"
 test "$(grep -Ec '^\| [^|]+ \| `(explorer|worker|docs_researcher|bulk_scout|reviewer)` \|' "${repo_root}/codex/AGENTS.md")" -eq 5
 test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
 test "$(grep -Ec 'fork_turns|gpt-5\.6-|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
 
-portable_files="${repo_root}/codex/AGENTS.md ${repo_root}/codex/RTK.md ${repo_root}/codex/agents/explorer.toml ${repo_root}/codex/agents/worker.toml ${repo_root}/codex/agents/docs_researcher.toml ${repo_root}/codex/agents/bulk_scout.toml ${repo_root}/codex/agents/reviewer.toml ${repo_root}/scripts/install-codex.sh"
+portable_files="${repo_root}/codex/AGENTS.md ${repo_root}/codex/agents/explorer.toml ${repo_root}/codex/agents/worker.toml ${repo_root}/codex/agents/docs_researcher.toml ${repo_root}/codex/agents/bulk_scout.toml ${repo_root}/codex/agents/reviewer.toml ${repo_root}/scripts/install-codex.sh"
 
 if grep -En '/Users/|/home/|[A-Za-z]:\\Users\\' ${portable_files}; then
   printf '%s\n' 'Machine-local path found in portable Codex files' >&2

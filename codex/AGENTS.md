@@ -1,12 +1,9 @@
 @~/.agents/AGENTS.md
-@~/.agents/codex/RTK.md
-@~/.agents/instructions/research.md
-@~/.agents/instructions/subagents.md
+@~/.codex/RTK.md
 
 # Codex Subagent Defaults
 
-Apply these Codex-specific rules together with the shared delegation guidance in
-`~/.agents/instructions/subagents.md`.
+Apply these Codex-specific rules together with the global agent instructions above.
 
 ## Context and Task Capsules
 
