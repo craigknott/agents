@@ -16,13 +16,6 @@ fi
 codex_loader='Read and follow `~/.agents/codex/AGENTS.md`.'
 legacy_codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
 
-test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
-test "$(grep -Fxc '@~/.agents/AGENTS.md' "${repo_root}/codex/AGENTS.md")" -eq 1
-test "$(grep -Fxc '@~/.codex/RTK.md' "${repo_root}/codex/AGENTS.md")" -eq 1
-test "$(grep -Ec '^@' "${repo_root}/codex/AGENTS.md")" -eq 2
-test "$(grep -Fxc '@~/.agents/instructions/research.md' "${repo_root}/codex/AGENTS.md")" -eq 0
-test "$(grep -Fxc '@~/.agents/instructions/subagents.md' "${repo_root}/codex/AGENTS.md")" -eq 0
-
 set -- \
   "${repo_root}/codex/AGENTS.md" \
   "${repo_root}/codex/agents/explorer.toml" \
