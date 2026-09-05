@@ -13,7 +13,8 @@ else
   trap 'rm -rf "${test_root}"' EXIT HUP INT TERM
 fi
 
-codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
+codex_loader='Read and follow `~/.agents/codex/AGENTS.md`.'
+legacy_codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
 
 test "$(grep -Fxc 'multi_agent_v2 = false' "${repo_root}/README.md")" -eq 1
 test "$(grep -Fxc '@~/.agents/AGENTS.md' "${repo_root}/codex/AGENTS.md")" -eq 1
@@ -21,10 +22,6 @@ test "$(grep -Fxc '@~/.codex/RTK.md' "${repo_root}/codex/AGENTS.md")" -eq 1
 test "$(grep -Ec '^@' "${repo_root}/codex/AGENTS.md")" -eq 2
 test "$(grep -Fxc '@~/.agents/instructions/research.md' "${repo_root}/codex/AGENTS.md")" -eq 0
 test "$(grep -Fxc '@~/.agents/instructions/subagents.md' "${repo_root}/codex/AGENTS.md")" -eq 0
-grep -Fq 'Ordinary delegations must use `fork_turns="none"`' "${repo_root}/codex/AGENTS.md"
-test "$(grep -Ec '^\| [^|]+ \| `(explorer|worker|docs_researcher|bulk_scout|reviewer)` \|' "${repo_root}/codex/AGENTS.md")" -eq 5
-test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
-test "$(grep -Ec 'fork_turns|gpt-5\.6-|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
 
 set -- \
   "${repo_root}/codex/AGENTS.md" \
@@ -49,6 +46,7 @@ fallback_home="${test_root}/fallback-home"
 mkdir -p "${fallback_home}/agents"
 printf '%s\n' 'name = "unrelated-fallback"' >"${fallback_home}/agents/unrelated.toml"
 printf '%s\n' '# Keep this fallback instruction.' >"${fallback_home}/AGENTS.md"
+printf '%s\n' "${legacy_codex_loader}" >>"${fallback_home}/AGENTS.md"
 : >"${fallback_home}/AGENTS.override.md"
 printf '%s\n' 'model = "fallback-sentinel"' >"${fallback_home}/config.toml"
 
@@ -64,6 +62,7 @@ done
 
 grep -Fq '# Keep this fallback instruction.' "${fallback_home}/AGENTS.md"
 test "$(grep -Fxc "${codex_loader}" "${fallback_home}/AGENTS.md")" -eq 1
+test "$(grep -Fxc "${legacy_codex_loader}" "${fallback_home}/AGENTS.md")" -eq 0
 test "$(cksum "${fallback_home}/AGENTS.override.md")" = "${fallback_override_before}"
 test "$(cksum "${fallback_home}/config.toml")" = "${fallback_config_before}"
 test "$(cksum "${fallback_home}/agents/unrelated.toml")" = "${fallback_unrelated_before}"
@@ -80,6 +79,7 @@ mkdir -p "${override_home}/agents"
 printf '%s\n' 'name = "unrelated-override"' >"${override_home}/agents/unrelated.toml"
 printf '%s\n' '# Keep this inactive instruction.' >"${override_home}/AGENTS.md"
 printf '%s\n' '# Keep this active override.' >"${override_home}/AGENTS.override.md"
+printf '%s\n' "${legacy_codex_loader}" "${codex_loader}" >>"${override_home}/AGENTS.override.md"
 printf '%s\n' 'model = "override-sentinel"' >"${override_home}/config.toml"
 
 override_config_before=$(cksum "${override_home}/config.toml")
@@ -94,6 +94,7 @@ done
 
 grep -Fq '# Keep this active override.' "${override_home}/AGENTS.override.md"
 test "$(grep -Fxc "${codex_loader}" "${override_home}/AGENTS.override.md")" -eq 1
+test "$(grep -Fxc "${legacy_codex_loader}" "${override_home}/AGENTS.override.md")" -eq 0
 test "$(cksum "${override_home}/AGENTS.md")" = "${override_agents_before}"
 test "$(cksum "${override_home}/config.toml")" = "${override_config_before}"
 test "$(cksum "${override_home}/agents/unrelated.toml")" = "${override_unrelated_before}"
