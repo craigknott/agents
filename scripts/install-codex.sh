@@ -34,7 +34,18 @@ ensure_include() {
   fi
 }
 
-ensure_include 'Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
+codex_loader='Read and follow `~/.agents/codex/AGENTS.md`.'
+legacy_codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
+
+if grep -Fqx "${legacy_codex_loader}" "${codex_instructions_file}"; then
+  loader_tmp=$(mktemp "${TMPDIR:-/tmp}/codex-loader.XXXXXX")
+  trap 'rm -f "${loader_tmp}"' EXIT HUP INT TERM
+  awk -v old_line="${legacy_codex_loader}" '$0 != old_line { print }' \
+    "${codex_instructions_file}" >"${loader_tmp}"
+  cat "${loader_tmp}" >"${codex_instructions_file}"
+fi
+
+ensure_include "${codex_loader}"
 
 printf 'Installed five Codex agents in %s\n' "${codex_agents_dir}"
 printf 'Updated Codex instruction directives in %s\n' "${codex_instructions_file}"

@@ -6,11 +6,14 @@ project conventions; defer safety, permissions, tool mechanics, and communicatio
 Within this instruction layer, repository-specific guidance and checked-in workflows take precedence. Read only the
 topic files relevant to the current task.
 
+Treat these files and skills as defaults for fulfilling the user's request. Explicit task instructions override these
+defaults; resolve routine choices from repository evidence and session context. Keep model routing in the tool-specific
+configuration, and avoid repeating behavior already supplied by the active harness.
+
 ## Topics
 
 - `instructions/workflow.md` — Repository discovery, implementation design, reuse, coding style, and validation.
-- `instructions/subagents.md` — Read before delegating: permission, decision criteria, scoping, and
-  integration.
+- `instructions/subagents.md` — Brief delegation preference.
 - `instructions/package-managers.md` — Package-manager selection and dependency changes.
 - `instructions/code-review.md` — Reviews, findings, and risk classification.
 - `instructions/git-and-pr.md` — Branches, commits, pushes, pull requests, and `no-mistakes`.

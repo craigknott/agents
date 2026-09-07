@@ -5,6 +5,15 @@ Personal, cross-repository instructions for coding agents.
 `AGENTS.md` and its referenced topic files are the source of truth for these cross-agent preferences. Tool-specific
 instruction files should stay as thin forwarders so the same guidance is loaded everywhere without copying it.
 
+## Astra defaults
+
+These instructions apply the
+[Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra) through the
+shared [workflow guidance](instructions/workflow.md) and [delegation preference](instructions/subagents.md).
+
+The routing configured in [Setup](#setup) is a workload policy, not a benchmark result. Compare task outcomes, latency,
+and usage before retuning effort or routing. Preserve the primary agent's effective effort during migration.
+
 ## Setup
 
 Clone this repository into `~/.agents`:
@@ -58,31 +67,35 @@ Install the shared Codex subagent definitions and instruction forwarders:
 The installer uses `$CODEX_HOME` when set and otherwise defaults to `~/.codex`. It copies these portable definitions
 into that Codex home's `agents/` directory:
 
-| Agent | Purpose | Default configuration |
-| --- | --- | --- |
-| `explorer` | Targeted repository exploration | Read-only; inherits the configured child model and effort |
-| `worker` | Bounded implementation and verification | Workspace-write; inherits the configured child model and effort |
-| `docs_researcher` | OpenAI Docs and optional Context7 research | `gpt-5.6-sol`, medium, read-only |
-| `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-5.6-terra`, medium, read-only |
-| `reviewer` | Correctness, security, regression, and test review | `gpt-5.6-sol`, high, read-only |
+- [explorer](codex/agents/explorer.toml)
+- [worker](codex/agents/worker.toml)
+- [docs_researcher](codex/agents/docs_researcher.toml)
+- [bulk_scout](codex/agents/bulk_scout.toml)
+- [reviewer](codex/agents/reviewer.toml)
 
 It preserves other files in `agents/` and follows Codex's global instruction precedence: when the selected home has a
-non-empty `AGENTS.override.md`, it appends missing loader directives there; otherwise it preserves or creates
-`AGENTS.md`. The installed directive loads `~/.agents/codex/AGENTS.md`, whose opening references mirror a normal Codex
-forwarder: `~/.agents/AGENTS.md` and the RTK installation's `~/.codex/RTK.md`, followed by the Codex-specific routing
-rules. The `.agents` installer does not install RTK and does not read or modify `config.toml` in that Codex home. Remove
-the RTK include if that optional tool is not installed. The pack contains no credentials. Configure Context7 separately
+non-empty `AGENTS.override.md`, it updates the loader there; otherwise it preserves or creates `AGENTS.md`. In that
+active file, it removes the exact legacy loader line describing subagent routing and context rules, then adds the short
+loader if missing, preserving other instructions. Repeated installation leaves the result unchanged.
+
+The installed directive loads [codex/AGENTS.md](codex/AGENTS.md), the thin forwarder. The `.agents` installer does not
+install RTK and does not read or modify `config.toml` in that Codex home. Remove the RTK include from the forwarder if
+that optional tool is not installed. The pack contains no credentials. Configure Context7 separately
 in your own Codex configuration if `docs_researcher` should use it; the agent inherits that server configuration.
 
-Current Codex releases enable subagents by default. To reproduce this repository's bounded child defaults and
-three-child cap, merge the following settings into the selected Codex home's `config.toml` (normally
-`~/.codex/config.toml`) without duplicating an existing table:
+To reproduce this setup's model defaults and six-child concurrency ceiling, merge the following settings into the
+selected Codex home's `config.toml` (normally `~/.codex/config.toml`). Put root model keys before any table, and update
+existing keys and tables instead of duplicating them. The
+[Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference) defines these settings.
 
 ```toml
+model = "gpt-6-astra"
+model_reasoning_effort = "xhigh"
+
 [agents]
 enabled = true
-max_concurrent_threads_per_session = 3
-default_subagent_model = "gpt-5.6-sol"
+max_concurrent_threads_per_session = 6
+default_subagent_model = "gpt-6-astra"
 default_subagent_reasoning_effort = "medium"
 interrupt_message = true
 
@@ -91,8 +104,9 @@ multi_agent = true
 multi_agent_v2 = false
 ```
 
-`fork_turns` is selected at spawn time rather than in `config.toml`. The Codex-specific instructions direct agents to
-pass `fork_turns="none"` for ordinary delegation and provide a self-contained task capsule.
+The configuration example above owns this setup's primary and default-child settings; the linked role TOML files own
+each role's model, effort, description, permissions, and responsibilities. Parent guidance lives in
+[instructions/subagents.md](instructions/subagents.md).
 
 For other agent tools, create their forwarding files separately:
 
@@ -113,7 +127,7 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 ## Repository Files
 
 - `AGENTS.md` - global entry point and router for topic-specific instructions.
-- `codex/AGENTS.md` - global and installed-RTK references plus Codex-specific role routing and bounded-context guidance.
+- `codex/AGENTS.md` - thin forwarder to the global instructions and installed RTK guidance.
 - `codex/agents/` - portable custom-agent definitions installed into the selected Codex home's `agents/` directory.
 - `instructions/` - focused guidance loaded only when the task matches the topic.
 - `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
@@ -138,10 +152,6 @@ The Codex active file should load:
 ~/.agents/codex/AGENTS.md
 ```
 
-That file begins with references to `~/.agents/AGENTS.md` and the optional installed `~/.codex/RTK.md`, then directs
-ordinary Codex delegations to use `fork_turns="none"`. Research and general delegation guidance remain routed through
-the shared `~/.agents/AGENTS.md` entry point instead of being referenced again here.
-
 Confirm that Codex can discover the shared roles:
 
 ```sh
@@ -153,6 +163,18 @@ Check that `no-mistakes` prerequisites are available:
 ```sh
 no-mistakes doctor
 ```
+
+Run the installer regression checks after changing the portable pack:
+
+```sh
+sh -n scripts/install-codex.sh
+sh -n tests/install-codex.sh
+sh tests/install-codex.sh
+git diff --check
+```
+
+These check installation, repeatability, and preservation of existing configuration; they do not evaluate how a model
+interprets the instructions.
 
 After changes are pushed, update another machine with:
 
