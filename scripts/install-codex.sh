@@ -15,10 +15,13 @@ fi
 
 mkdir -p "${codex_agents_dir}"
 
-for agent_name in explorer worker docs_researcher bulk_scout reviewer; do
+agent_count=0
+for agent_file in "${agents_repo_dir}"/codex/agents/*.toml; do
+  agent_filename=${agent_file##*/}
   install -m 0644 \
-    "${agents_repo_dir}/codex/agents/${agent_name}.toml" \
-    "${codex_agents_dir}/${agent_name}.toml"
+    "${agent_file}" \
+    "${codex_agents_dir}/${agent_filename}"
+  agent_count=$((agent_count + 1))
 done
 
 touch "${codex_instructions_file}"
@@ -36,5 +39,5 @@ ensure_include() {
 
 ensure_include 'Read and follow `~/.agents/codex/AGENTS.md` for Codex-specific subagent routing and context rules.'
 
-printf 'Installed five Codex agents in %s\n' "${codex_agents_dir}"
+printf 'Installed %s Codex agents in %s\n' "${agent_count}" "${codex_agents_dir}"
 printf 'Updated Codex instruction directives in %s\n' "${codex_instructions_file}"

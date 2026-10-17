@@ -19,11 +19,19 @@ Use these defaults when the Codex surface exposes the corresponding role and mod
 
 | Task | Role | Model | Effort |
 | --- | --- | --- | --- |
+| Targeted repository exploration with Sol | `explorer_sol` | `gpt-6.1-sol` | medium |
+| Bounded implementation and verification with Sol | `worker_sol` | `gpt-6.1-sol` | medium |
+| Focused correctness, regression, or test review with Sol | `reviewer_sol` | `gpt-6.1-sol` | high |
 | Targeted repository exploration | `explorer` | `gpt-6-astra` | medium |
 | Bounded implementation and verification | `worker` | `gpt-6-astra` | medium |
 | OpenAI or library documentation research | `docs_researcher` | `gpt-6-astra` | medium |
 | Large-file, log, or repository-partition scan | `bulk_scout` | `gpt-6-astra` | medium |
 | Correctness, security, regression, or test review | `reviewer` | `gpt-6-astra` | high |
+
+Prefer the Sol roles for well-scoped exploration, implementation, and review. Keep the Astra roles available for
+ambiguous investigations, specialized research or scans, and complex or high-risk review. Honor an explicitly
+requested model. The Sol definitions pin both model and effort, so select the corresponding Astra role when needed
+instead of trying to override a Sol role's configuration.
 
 Keep complex or high-risk implementation with the primary agent unless one bounded `worker` task provides useful
 isolation. In that rare case, prefer `gpt-6-astra` with xhigh effort and the smallest sufficient context.

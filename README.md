@@ -24,11 +24,20 @@ into that Codex home's `agents/` directory:
 
 | Agent | Purpose | Default configuration |
 | --- | --- | --- |
+| `explorer_sol` | Targeted repository exploration with Sol | `gpt-6.1-sol`, medium, read-only instructions |
+| `worker_sol` | Bounded implementation and verification with Sol | `gpt-6.1-sol`, medium, local edits |
+| `reviewer_sol` | Focused correctness, regression, and test review with Sol | `gpt-6.1-sol`, high, read-only instructions |
 | `explorer` | Targeted repository exploration | Read-only; inherits the configured child model and effort |
 | `worker` | Bounded implementation and verification | Workspace-write; inherits the configured child model and effort |
 | `docs_researcher` | OpenAI Docs and optional Context7 research | `gpt-6-astra`, medium, read-only |
 | `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-6-astra`, medium, read-only |
 | `reviewer` | Correctness, security, regression, and test review | `gpt-6-astra`, high, read-only |
+
+Prefer the Sol roles for well-scoped exploration, implementation, and review; use the Astra routing for ambiguous
+investigations, specialized research or scans, and complex or high-risk review. The Sol files pin both model and effort
+independently of the configured child defaults. These settings follow the
+[OpenAI custom-agent configuration](https://learn.chatgpt.com/docs/agent-configuration/subagents#custom-agents).
+Agents inherit the parent session's permissions; read-only behavior is also specified in their instructions.
 
 It preserves other files in `agents/` and follows Codex's global instruction precedence: when the selected home has a
 non-empty `AGENTS.override.md`, it appends missing loader directives there; otherwise it preserves or creates
@@ -114,7 +123,8 @@ the shared `~/.agents/AGENTS.md` entry point instead of being referenced again h
 Confirm that Codex can discover the shared roles:
 
 ```sh
-ls ~/.codex/agents/{explorer,worker,docs_researcher,bulk_scout,reviewer}.toml
+ls ~/.codex/agents/{explorer,worker,reviewer}{,_sol}.toml \
+  ~/.codex/agents/{docs_researcher,bulk_scout}.toml
 ```
 
 After changes are pushed, update another machine with:
