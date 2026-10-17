@@ -5,6 +5,8 @@ Use for code reviews, audits, readiness checks, and risk assessments. Review wit
 - Lead with actionable findings ordered by severity.
 - Prioritize correctness, regressions, security, missing tests, reliability, and maintainability.
 - Give each finding a precise file and line reference, explain its impact, and avoid style-only comments.
+- Apply the reviewability and readability guidance in `instructions/workflow.md`. Report concrete blind spots or
+  maintainability risks rather than enforcing an arbitrary line-count limit or personal style preference.
 - If there are no findings, say so and note any validation gaps or residual risk.
 
 ## Risk
