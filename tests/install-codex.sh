@@ -23,8 +23,8 @@ test "$(grep -Fxc '@~/.agents/instructions/research.md' "${repo_root}/codex/AGEN
 test "$(grep -Fxc '@~/.agents/instructions/subagents.md' "${repo_root}/codex/AGENTS.md")" -eq 0
 grep -Fq 'Ordinary delegations must use `fork_turns="none"`' "${repo_root}/codex/AGENTS.md"
 test "$(grep -Ec '^\| [^|]+ \| `(explorer|worker|docs_researcher|bulk_scout|reviewer)` \|' "${repo_root}/codex/AGENTS.md")" -eq 5
-test "$(grep -Ec 'gpt-5\.6-(sol|terra)' "${repo_root}/codex/AGENTS.md")" -ge 5
-test "$(grep -Ec 'fork_turns|gpt-5\.6-|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
+test "$(grep -Ec 'gpt-6-astra' "${repo_root}/codex/AGENTS.md")" -ge 5
+test "$(grep -Ec 'fork_turns|gpt-[0-9]|`(explorer|worker|docs_researcher|bulk_scout|reviewer)`' "${repo_root}/instructions/subagents.md")" -eq 0
 
 set -- \
   "${repo_root}/codex/AGENTS.md" \

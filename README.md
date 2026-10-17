@@ -13,42 +13,6 @@ Clone this repository into `~/.agents`:
 git clone git@github.com:craigknott/agents.git ~/.agents
 ```
 
-Install `no-mistakes` and make sure the `no-mistakes` binary is on your `PATH`:
-
-```sh
-go install github.com/kunchenguid/no-mistakes/cmd/no-mistakes@latest
-```
-
-If the command is not found after installation, add Go's binary directory to your shell `PATH`:
-
-```sh
-export PATH="$(go env GOPATH)/bin:$PATH"
-```
-
-Persist that line in your shell startup file, such as `~/.zshrc`, when needed.
-
-Initialize `no-mistakes` only in repositories where you want to use its validation gate:
-
-```sh
-no-mistakes init
-```
-
-The agent defaults make this the canonical gate for requested Git pushes, pull-request delivery, and explicit validation
-unless the user or repository specifies another workflow; ordinary repository work does not trigger initialization.
-
-`no-mistakes init` also installs the `/no-mistakes` agent skill. From a supported coding agent, you can gate a task
-directly:
-
-```text
-/no-mistakes add a --json flag to the status command
-```
-
-Or validate already committed branch work:
-
-```text
-/no-mistakes
-```
-
 Install the shared Codex subagent definitions and instruction forwarders:
 
 ```sh
@@ -62,9 +26,9 @@ into that Codex home's `agents/` directory:
 | --- | --- | --- |
 | `explorer` | Targeted repository exploration | Read-only; inherits the configured child model and effort |
 | `worker` | Bounded implementation and verification | Workspace-write; inherits the configured child model and effort |
-| `docs_researcher` | OpenAI Docs and optional Context7 research | `gpt-5.6-sol`, medium, read-only |
-| `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-5.6-terra`, medium, read-only |
-| `reviewer` | Correctness, security, regression, and test review | `gpt-5.6-sol`, high, read-only |
+| `docs_researcher` | OpenAI Docs and optional Context7 research | `gpt-6-astra`, medium, read-only |
+| `bulk_scout` | Large-file, log, or repository-partition scans | `gpt-6-astra`, medium, read-only |
+| `reviewer` | Correctness, security, regression, and test review | `gpt-6-astra`, high, read-only |
 
 It preserves other files in `agents/` and follows Codex's global instruction precedence: when the selected home has a
 non-empty `AGENTS.override.md`, it appends missing loader directives there; otherwise it preserves or creates
@@ -82,7 +46,7 @@ three-child cap, merge the following settings into the selected Codex home's `co
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
-default_subagent_model = "gpt-5.6-sol"
+default_subagent_model = "gpt-6-astra"
 default_subagent_reasoning_effort = "medium"
 interrupt_message = true
 
@@ -118,6 +82,11 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 - `instructions/` - focused guidance loaded only when the task matches the topic.
 - `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
 
+The [communication guide](instructions/communication.md) sets a plain-language default inspired by ASD-STE100 and
+encourages diagrams, interactive HTML, and explainer videos when they make results easier to understand. The
+[delivery guide](instructions/git-and-pr.md) uses each repository's existing checks and workflow for validation,
+pushes, and pull requests.
+
 ## Verify
 
 With the default Codex home, inspect the active Codex global instruction file and the other forwarding files:
@@ -146,12 +115,6 @@ Confirm that Codex can discover the shared roles:
 
 ```sh
 ls ~/.codex/agents/{explorer,worker,docs_researcher,bulk_scout,reviewer}.toml
-```
-
-Check that `no-mistakes` prerequisites are available:
-
-```sh
-no-mistakes doctor
 ```
 
 After changes are pushed, update another machine with:

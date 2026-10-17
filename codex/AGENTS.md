@@ -19,14 +19,14 @@ Use these defaults when the Codex surface exposes the corresponding role and mod
 
 | Task | Role | Model | Effort |
 | --- | --- | --- | --- |
-| Targeted repository exploration | `explorer` | `gpt-5.6-sol` | medium |
-| Bounded implementation and verification | `worker` | `gpt-5.6-sol` | medium |
-| OpenAI or library documentation research | `docs_researcher` | `gpt-5.6-sol` | medium |
-| Large-file, log, or repository-partition scan | `bulk_scout` | `gpt-5.6-terra` | medium |
-| Correctness, security, regression, or test review | `reviewer` | `gpt-5.6-sol` | high |
+| Targeted repository exploration | `explorer` | `gpt-6-astra` | medium |
+| Bounded implementation and verification | `worker` | `gpt-6-astra` | medium |
+| OpenAI or library documentation research | `docs_researcher` | `gpt-6-astra` | medium |
+| Large-file, log, or repository-partition scan | `bulk_scout` | `gpt-6-astra` | medium |
+| Correctness, security, regression, or test review | `reviewer` | `gpt-6-astra` | high |
 
 Keep complex or high-risk implementation with the primary agent unless one bounded `worker` task provides useful
-isolation. In that rare case, prefer `gpt-5.6-sol` with xhigh effort and the smallest sufficient context.
+isolation. In that rare case, prefer `gpt-6-astra` with xhigh effort and the smallest sufficient context.
 
 If a Codex surface does not expose a named role, reproduce that role's responsibility in the task capsule and set the
 model and effort explicitly when supported. If it does not support bounded-history controls, provide the smallest
