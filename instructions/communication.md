@@ -22,14 +22,9 @@ Use when explaining work, answering questions, giving progress updates, or prese
 - Use diagrams or images when relationships, structure, flows, or spatial ideas are clearer visually. Prefer a small
   Mermaid diagram for a static technical explanation; use other visual tools when they add useful detail.
 - Use tables for comparisons and mappings. Label visuals clearly and include a short explanation of the key point.
-- Create interactive HTML or a small explainer web app when changing inputs, stepping through a process, or exploring
-  scenarios helps the user learn. Make controls meaningful, show assumptions, and provide a useful initial view.
-- Create a bespoke explainer video when requested or when motion, timing, and narration materially improve understanding.
-  Build a clear sequence of visual examples, with captions or a transcript. Use available narration tools; when no
-  suitable service is available, consider local or free alternatives and state any capability limits.
-- Be willing to build custom, disposable learning artifacts when they save the user effort, even if used only once.
-  Choose their scope based on the learning benefit and the cost to create and use them. A richer format should help
-  the user inspect the explanation, not just decorate it.
+- Build interactive HTML, an explainer video, or another rich artifact only when the user asks for it or when
+  exploring inputs, steps, or motion clearly helps them understand. A richer format should help the user inspect the
+  explanation, not decorate it.
 
-Use `instructions/artifacts.md` for artifact creation and verification, and `instructions/frontend.md` for interactive
-web experiences.
+Use `~/.agents/instructions/artifacts.md` for artifact creation and verification, and
+`~/.agents/instructions/frontend.md` for interactive web experiences.

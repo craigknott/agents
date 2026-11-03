@@ -19,7 +19,8 @@ legacy_codex_loader='Read and follow `~/.agents/codex/AGENTS.md` for Codex-speci
 set -- \
   "${repo_root}/codex/AGENTS.md" \
   "${repo_root}"/codex/agents/*.toml \
-  "${repo_root}/scripts/install-codex.sh"
+  "${repo_root}/scripts/install-codex.sh" \
+  "${repo_root}/scripts/install-common.sh"
 
 if grep -En '/Users/|/home/|[A-Za-z]:\\Users\\' "$@"; then
   printf '%s\n' 'Machine-local path found in portable Codex files' >&2
@@ -34,6 +35,9 @@ fi
 fallback_home="${test_root}/fallback-home"
 mkdir -p "${fallback_home}/agents"
 printf '%s\n' 'name = "unrelated-fallback"' >"${fallback_home}/agents/unrelated.toml"
+printf '%s\n' 'name = "explorer_sol"' >"${fallback_home}/agents/explorer_sol.toml"
+printf '%s\n' 'name = "bulk_scout"' >"${fallback_home}/agents/bulk_scout.toml"
+printf '%s\n' 'name = "worker"' 'model = "my-personal-model"' >"${fallback_home}/agents/worker.toml"
 printf '%s\n' '# Keep this fallback instruction.' >"${fallback_home}/AGENTS.md"
 printf '%s\n' "${legacy_codex_loader}" >>"${fallback_home}/AGENTS.md"
 : >"${fallback_home}/AGENTS.override.md"
@@ -48,7 +52,13 @@ CODEX_HOME="${fallback_home}" "${repo_root}/scripts/install-codex.sh" >"${test_r
 for agent_file in "${repo_root}"/codex/agents/*.toml; do
   cmp "${agent_file}" "${fallback_home}/agents/${agent_file##*/}"
 done
-grep -Fq 'Installed 8 Codex agents in ' "${test_root}/fallback-first.txt"
+grep -Fq 'Installed 6 Codex agents in ' "${test_root}/fallback-first.txt"
+test ! -e "${fallback_home}/agents/explorer_sol.toml"
+test ! -e "${fallback_home}/agents/bulk_scout.toml"
+for backed_up in explorer_sol bulk_scout worker; do
+  test "$(find "${fallback_home}/backups/agents-pack" -name "${backed_up}.toml.*" -type f | wc -l)" -eq 1
+done
+grep -Fxq 'model = "my-personal-model"' "$(find "${fallback_home}/backups/agents-pack" -name 'worker.toml.*' -type f)"
 
 grep -Fq '# Keep this fallback instruction.' "${fallback_home}/AGENTS.md"
 test "$(grep -Fxc "${codex_loader}" "${fallback_home}/AGENTS.md")" -eq 1
@@ -121,4 +131,4 @@ default_state_after_repeat=$(find "${default_codex_home}" -type f -exec cksum {}
 
 test "${default_state_after_repeat}" = "${default_state_before_repeat}"
 
-printf '%s\n' 'Installer checks passed for the default home, AGENTS.md fallback, and AGENTS.override.md precedence.'
+printf '%s\n' 'Installer checks passed for the default home, AGENTS.md fallback, AGENTS.override.md precedence, retired roles, and backups.'

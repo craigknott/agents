@@ -1,98 +1,121 @@
 # Agents
 
-Personal, cross-repository instructions for coding agents.
+Personal, cross-repository instructions for coding agents in Claude Code and Codex.
 
 `AGENTS.md` and its referenced topic files are the source of truth for these cross-agent preferences. Tool-specific
-instruction files should stay as thin forwarders so the same guidance is loaded everywhere without copying it.
+instruction files stay as thin forwarders so the same guidance is loaded everywhere without copying it. Harness-specific
+orchestration, such as T3 Code's delegation tools, stays in that harness's own configuration.
 
-## Astra defaults
+The two most important topics are:
 
-These instructions apply the
-[Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra) through the
-shared [workflow guidance](instructions/workflow.md) and [delegation preference](instructions/subagents.md).
+- [Verification contract](instructions/workflow.md#verification-contract) — define done, the oracle, and the baseline
+  before editing, so agents can work and check themselves unattended.
+- [Delegation](instructions/delegation.md) — role routing across Claude and Codex models, and how to reach the other
+  provider.
 
-The routing configured in [Setup](#setup) is a workload policy, not a benchmark result. Compare task outcomes, latency,
-and usage before retuning effort or routing. Preserve the primary agent's effective effort during migration.
+The routing is a workload policy, not a benchmark result. Compare task outcomes, latency, and usage before retuning
+effort or routing.
 
 ## Setup
 
-Clone this repository into `~/.agents`:
+Clone this repository into `~/.agents` and run the installer:
 
 ```sh
 git clone git@github.com:craigknott/agents.git ~/.agents
+~/.agents/scripts/install.sh
 ```
 
-Install the shared Codex subagent definitions and instruction forwarders:
+`install.sh` runs both tool installers. Each is idempotent, preserves unrelated files, and contains no credentials.
+Before replacing a role file that differs from this pack's version, or removing a retired one, an installer moves it to
+`backups/agents-pack/` in that tool's home under a timestamped name.
 
-```sh
-~/.agents/scripts/install-codex.sh
-```
+**Codex** (`scripts/install-codex.sh`) uses `$CODEX_HOME` or `~/.codex`. It:
 
-The installer uses `$CODEX_HOME` when set and otherwise defaults to `~/.codex`. It copies these portable definitions
-into that Codex home's `agents/` directory:
+- copies the role files from [codex/agents](codex/agents) into `agents/` and removes retired roles from this pack;
+- adds a loader line for the thin forwarder [codex/AGENTS.md](codex/AGENTS.md) to the active global instruction file.
+  That is `AGENTS.override.md` when it is non-empty, otherwise `AGENTS.md`. It also removes the legacy loader line.
 
-- [explorer_sol](codex/agents/explorer_sol.toml)
-- [worker_sol](codex/agents/worker_sol.toml)
-- [reviewer_sol](codex/agents/reviewer_sol.toml)
-- [explorer](codex/agents/explorer.toml)
-- [worker](codex/agents/worker.toml)
-- [docs_researcher](codex/agents/docs_researcher.toml)
-- [bulk_scout](codex/agents/bulk_scout.toml)
-- [reviewer](codex/agents/reviewer.toml)
+It does not read or modify `config.toml`. The forwarder also includes `~/.codex/RTK.md`; remove that line if RTK is
+not installed. Configure Context7 in your own Codex config if `docs_researcher` should use it.
 
-Prefer the Sol roles for well-scoped exploration, implementation, and review; use the Astra roles for ambiguous
-investigations, specialized research or scans, and complex or high-risk review. The Sol files pin both model and effort
-independently of the configured child defaults. Select the corresponding Astra role when needed instead of trying to
-override a Sol role's configuration. These settings follow the
-[OpenAI custom-agent configuration](https://learn.chatgpt.com/docs/agent-configuration/subagents#custom-agents).
-Agents inherit the parent session's permissions; read-only behavior is also specified in their instructions.
+**Claude Code** (`scripts/install-claude.sh`) uses `$CLAUDE_CONFIG_DIR` or `~/.claude`. It:
 
-It preserves other files in `agents/` and follows Codex's global instruction precedence: when the selected home has a
-non-empty `AGENTS.override.md`, it updates the loader there; otherwise it preserves or creates `AGENTS.md`. In that
-active file, it removes the exact legacy loader line describing subagent routing and context rules, then adds the short
-loader if missing, preserving other instructions. Repeated installation leaves the result unchanged.
+- copies the role files from [claude/agents](claude/agents) into `agents/`;
+- links each shared skill in [skills](skills) into `skills/`, keeping any existing entry of the same name, and removes
+  links to shared skills that no longer exist;
+- adds `@~/.agents/AGENTS.md` to the user `CLAUDE.md`.
 
-The installed directive loads [codex/AGENTS.md](codex/AGENTS.md), the thin forwarder. The `.agents` installer does not
-install RTK and does not read or modify `config.toml` in that Codex home. Remove the RTK include from the forwarder if
-that optional tool is not installed. The pack contains no credentials. Configure Context7 separately
-in your own Codex configuration if `docs_researcher` should use it; the agent inherits that server configuration.
+Claude Code reads a repository's `AGENTS.md` natively, but not anything under `~/.agents`, so the user import is still
+needed for these global instructions.
 
-To reproduce this setup's model defaults and six-child concurrency ceiling, merge the following settings into the
-selected Codex home's `config.toml` (normally `~/.codex/config.toml`). Put root model keys before any table, and update
-existing keys and tables instead of duplicating them. The
-[Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference) defines these settings.
+### Skills
+
+`skills/` is the one home for shared skills in the open Agent Skills format. Codex reads `~/.agents/skills` natively as
+its user skills folder; the Claude installer links each skill into `~/.claude/skills`. Skills that third-party tools
+install and update there, such as `no-mistakes`, are listed in `.gitignore` so only skills authored here are tracked.
+
+### Roles
+
+| Role | Claude | Codex | Writes |
+|---|---|---|---|
+| `scout` | Haiku | `gpt-6-luna` medium | no |
+| `explorer` | Sonnet medium | `gpt-6.1-sol` medium | no |
+| `worker` | Sonnet medium | `gpt-6.1-sol` medium | yes |
+| `reviewer` | Opus high | `gpt-6.1-sol` high | no |
+| `deep_reviewer` | Fable high | `gpt-6-astra` high | no |
+| `docs_researcher` | — | `gpt-6.1-sol` medium | no |
+
+Role files pin model and effort independently of the configured child defaults. Native subagents inherit the parent
+session's permissions. Codex enforces read-only roles with its sandbox. Native Claude read-only roles block the edit
+tools but keep Bash so reviewers can rerun checks.
+
+### Cross-provider delegation
+
+When the harness has its own cross-provider tool (for example T3 Code), agents use that. Otherwise:
+
+- **Claude Code to Codex** uses OpenAI's official [codex plugin](https://github.com/openai/codex-plugin-cc). Install it
+  once:
+
+  ```sh
+  claude plugin marketplace add openai/codex-plugin-cc
+  claude plugin install codex@openai-codex
+  ```
+
+  Agents use its `codex:codex-rescue` subagent; `/codex:review` and `/codex:adversarial-review` are for you to run.
+  Its optional stop-time review gate is off by default; leave it off unless you are watching the session.
+- **Codex to Claude Code** uses [scripts/claude-delegate.sh](scripts/claude-delegate.sh). It loads the Claude role
+  file, reads the brief from stdin, and prints only Claude's final message. It refuses to run inside a delegated child
+  (`AGENT_DEPTH` of 1 or higher), times out after 30 minutes by default, and never prints output on stdout for a
+  failure, timeout, or empty result. Read-only roles run with `--restricted`, which ignores settings files, so only
+  Read, Grep, Glob, and read-only `git` commands are allowed. It needs `perl`: the script hands the run to
+  [a small supervisor](scripts/claude-delegate-supervisor.pl) that runs Claude in its own process group, so a timeout
+  or cancellation (HUP, INT, or TERM) stops every tool Claude started, and no tool outlives a finished run. A wrapper
+  killed with SIGKILL cannot clean up, so its Claude run keeps going until it ends by itself.
+
+### Codex config
+
+To reproduce this setup's model defaults and six-child concurrency ceiling, merge these settings into the Codex home's
+`config.toml`. Put root keys before any table, and update existing keys instead of duplicating them. The
+[Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference) defines them.
 
 ```toml
-model = "gpt-6-astra"
+model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 6
-default_subagent_model = "gpt-6-astra"
+default_subagent_model = "gpt-6.1-sol"
 default_subagent_reasoning_effort = "medium"
-interrupt_message = true
 
 [features]
 multi_agent = true
 multi_agent_v2 = false
 ```
 
-The configuration example above owns this setup's primary and default-child settings; the linked role TOML files own
-each role's model, effort, description, permissions, and responsibilities. Parent guidance lives in
-[instructions/subagents.md](instructions/subagents.md).
+### Other tools
 
-For other agent tools, create their forwarding files separately:
-
-```sh
-mkdir -p ~/.claude ~/.gemini
-printf '@~/.agents/AGENTS.md\n' > ~/.claude/CLAUDE.md
-printf '@~/.agents/AGENTS.md\n' > ~/.gemini/GEMINI.md
-```
-
-Add guidance that a tool must always load as another include rather than copying shared rules into the forwarding file.
-
-Use the same pattern for any other agent tool that supports `@` includes:
+For another agent tool that supports `@` includes, point its instruction file at the shared entry point:
 
 ```sh
 printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
@@ -100,58 +123,40 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 
 ## Repository Files
 
-- `AGENTS.md` - global entry point and router for topic-specific instructions.
-- `codex/AGENTS.md` - thin forwarder to the global instructions and installed RTK guidance.
-- `codex/agents/` - portable custom-agent definitions installed into the selected Codex home's `agents/` directory.
-- `instructions/` - focused guidance loaded only when the task matches the topic.
-- `scripts/install-codex.sh` - idempotent Codex agent and instruction-forwarder installer.
-
-The [communication guide](instructions/communication.md) sets a plain-language default inspired by ASD-STE100 and
-encourages diagrams, interactive HTML, and explainer videos when they make results easier to understand. The
-[delivery guide](instructions/git-and-pr.md) uses each repository's existing checks and workflow for validation,
-pushes, and pull requests.
+- `AGENTS.md` — global entry point and router for topic-specific instructions.
+- `instructions/` — focused guidance loaded only when the task matches the topic.
+- `codex/AGENTS.md`, `codex/agents/` — Codex forwarder and role definitions.
+- `claude/agents/` — Claude Code role definitions.
+- `skills/` — shared skills, read by Codex directly and linked into Claude Code.
+- `scripts/` — installers, their shared helpers, and the Codex-to-Claude delegation script and supervisor.
+- `tests/` — checks for the scripts, pinned models, and role parity.
 
 ## Verify
 
-With the default Codex home, inspect the active Codex global instruction file and the other forwarding files:
+Run the checks after changing the pack:
 
 ```sh
-if [ -s ~/.codex/AGENTS.override.md ]; then
-  cat ~/.codex/AGENTS.override.md
-else
-  cat ~/.codex/AGENTS.md
-fi
-cat ~/.claude/CLAUDE.md
-cat ~/.gemini/GEMINI.md
-```
-
-The Codex active file should load:
-
-```text
-~/.agents/codex/AGENTS.md
-```
-
-Confirm that Codex can discover the shared roles:
-
-```sh
-ls ~/.codex/agents/{explorer,worker,reviewer}{,_sol}.toml \
-  ~/.codex/agents/{docs_researcher,bulk_scout}.toml
-```
-
-Run the installer regression checks after changing the portable pack:
-
-```sh
-sh -n scripts/install-codex.sh
-sh -n tests/install-codex.sh
-sh tests/install-codex.sh
+for f in scripts/*.sh tests/*.sh; do sh -n "$f"; done
+for t in tests/*.sh; do sh "$t"; done
 git diff --check
 ```
 
-These check installation, repeatability, and preservation of existing configuration; they do not evaluate how a model
-interprets the instructions.
+`tests/models.sh` checks that every pinned Codex model is offered by the local Codex CLI (`models_cache.json`), and that
+Claude models are valid aliases or IDs. `tests/role-parity.sh` checks that each shared role has the same name and
+instructions on both platforms. The other tests check the installers and the delegation script's routing, restriction,
+failure handling, timeout, and nesting guard with a stub CLI. None of these checks shows how a model interprets the
+instructions.
+
+After installing, confirm both tools load the shared instructions and roles:
+
+```sh
+cat ~/.claude/CLAUDE.md                 # contains @~/.agents/AGENTS.md
+ls ~/.claude/agents ~/.codex/agents
+cd /tmp && claude -p "Which topic file covers delegation in your global instructions?"
+```
 
 After changes are pushed, update another machine with:
 
 ```sh
-git -C ~/.agents pull --ff-only
+git -C ~/.agents pull --ff-only && ~/.agents/scripts/install.sh
 ```
