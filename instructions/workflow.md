@@ -5,6 +5,32 @@ Use when exploring, changing, or validating a repository.
 - Inspect the nearest repository instructions, manifests and lockfiles, scripts, CI, test configuration, and nearby code
   relevant to the task.
 - Follow established architecture, naming, ownership, and error-handling patterns.
+- Keep a repository's agent instructions in `AGENTS.md`, which both Claude Code and Codex read natively. Do not add a
+  `CLAUDE.md` or `CLAUDE.local.md` beside it: either one stops Claude Code from reading `AGENTS.md` by default. When a
+  repository already has both, propose merging them into `AGENTS.md`.
+
+## Verification Contract
+
+Before editing on any non-trivial task, define this contract and keep it current. Keep it in your working plan and
+in delegated briefs, not in these instruction files.
+
+1. **Done when:** observable acceptance criteria, each tied to one check.
+2. **Oracle:** the command or observation that proves each criterion. Prefer, in order: an existing or new failing
+   test; the real consumer (run the CLI, call the endpoint, render the page); a typed parse or schema check; recorded
+   manual inspection. Reading the code is not an oracle.
+3. **Baseline:** run the checks before changing anything. Record failures that already exist so they are not mistaken
+   for regressions.
+4. **Red first:** for bugs and new behavior, show the check failing before the fix when practical. When you add a
+   check, confirm it can fail.
+5. **Loop:** edit, run the narrowest check, then run the full required checks at the end. If one check fails three
+   times after different fixes, stop patching and re-diagnose the cause.
+6. **Independent check:** for medium or high risk, ask a reviewer from the other model family to check the request,
+   the contract, and the diff. Follow `~/.agents/instructions/delegation.md`.
+7. **Report:** give each criterion with its evidence (command and result), and state what stayed unverified.
+
+If no oracle exists, say so before you start. Build the smallest one that works, or ask. If the repository has no
+documented verification command, take it from CI or the manifests and propose a `## Verify` section for its
+`AGENTS.md`.
 
 ## Backward Compatibility
 
@@ -53,4 +79,5 @@ Use when exploring, changing, or validating a repository.
   failures, or a concrete unresolved risk; passing checks should lead to delivery.
 - Inspect the final diff for unrelated churn, debugging residue, accidental local paths, and test coverage of the
   changed behavior.
-- Report the commands that ran, their outcomes, and any validation that remains unavailable.
+- Report against the verification contract: the commands that ran, their outcomes, and any validation that remains
+  unavailable.

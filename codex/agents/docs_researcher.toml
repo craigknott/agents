@@ -1,6 +1,6 @@
 name = "docs_researcher"
-description = "Read-only documentation researcher for OpenAI Developer Docs and an optional inherited Context7 server."
-model = "gpt-6-astra"
+description = "Sol read-only documentation researcher for OpenAI Developer Docs and an optional inherited Context7 server."
+model = "gpt-6.1-sol"
 model_reasoning_effort = "medium"
 sandbox_mode = "read-only"
 web_search = "disabled"
