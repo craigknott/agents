@@ -6,7 +6,7 @@ Use when branching, staging, committing, pushing, creating pull requests, or add
 - Honor repository commit policies, such as DCO sign-off, for every commit in the delivery range, including automated
   commits.
 - Follow the repository's PR template and naming rules. When none exist, use
-  `<ISSUEID|NOISSUE> - [<low|medium|high>] - <Title>`.
+  `<ISSUEID|NOISSUE> - [<low-risk|medium-risk|high-risk>] - <Title>`.
 - Scale the PR description to the change: explain the resulting behavior and validation, then material compatibility,
   feature-gate, rollout, risk, and rollback details when relevant.
 - Use the repository's existing validation and delivery workflow. Before publishing changes, review the final diff
