@@ -26,7 +26,9 @@ in delegated briefs, not in these instruction files.
    times after different fixes, stop patching and re-diagnose the cause.
 6. **Independent check:** for medium or high risk, ask a reviewer from the other model family to check the request,
    the contract, and the diff. Follow `~/.agents/instructions/delegation.md`.
-7. **Report:** give each criterion with its evidence (command and result), and state what stayed unverified.
+7. **Report:** give each criterion with its evidence (command and result, or a screenshot or recording of the running
+   system), and state what stayed unverified. For a pull request, put this evidence in its description as
+   `~/.agents/instructions/git-and-pr.md` describes.
 
 If no oracle exists, say so before you start. Build the smallest one that works, or ask. If the repository has no
 documented verification command, take it from CI or the manifests and propose a `## Verify` section for its
@@ -53,6 +55,12 @@ documented verification command, take it from CI or the manifests and propose a 
 
 - Treat reviewability as part of correctness. Shape work as the smallest coherent slice that delivers understandable,
   testable behavior; do not use one-shot completion to justify a diff that is too broad to review confidently.
+- Use size as a trigger to split, not as a hard limit. Aim for about 200 changed lines of reviewable code per pull
+  request, and split or explain the coupling above about 400. Count hand-written code and tests. Exclude generated
+  files, lockfiles, snapshots, vendored code, pure deletions, and mechanical changes from a trusted tool, and say how
+  those were produced. A change spread across many unrelated files is too large even when its line count is small.
+- When a change is likely to exceed that size, plan the slices before editing and put them in the verification
+  contract. Splitting a finished diff afterwards is harder and tends to leave layers that cannot be tested alone.
 - Separate independent refactors, dependency or generated-file churn, migrations, and behavior changes when practical.
   If a change cannot be divided safely, explain the coupling and give reviewers a clear path through it.
 - Optimize code for the next reader: use names that convey intent, keep control flow direct, keep responsibilities

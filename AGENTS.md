@@ -24,7 +24,8 @@ before editing. Keep it in your plan or delegated brief; never write task detail
   to reach another provider.
 - `~/.agents/instructions/package-managers.md` — Package-manager selection and dependency changes.
 - `~/.agents/instructions/code-review.md` — Reviews, findings, and risk classification.
-- `~/.agents/instructions/git-and-pr.md` — Branches, commits, pushes, pull requests, and delivery validation.
+- `~/.agents/instructions/git-and-pr.md` — Branches, commits, pushes, pull requests, stacks, verification evidence,
+  and delivery validation.
 - `~/.agents/instructions/reliability.md` — Async, distributed, migration, and operational changes.
 - `~/.agents/instructions/frontend.md` — UI implementation, design preferences, and visual verification.
 - `~/.agents/instructions/research.md` — Third-party and OpenAI documentation.
