@@ -8,5 +8,8 @@ For third-party libraries, frameworks, SDKs, APIs, CLIs, and cloud services, use
 2. Prefer the exact, official, version-matched source.
 3. Query the selected ID with the user's full question.
 
+When Context7 is unavailable or does not have the library, use the official documentation for the version that the
+repository pins. Say which source and version you used.
+
 Use official OpenAI documentation for OpenAI products. Context7 is unnecessary for general programming concepts,
 business logic, refactoring, or code review.

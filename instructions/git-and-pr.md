@@ -6,10 +6,12 @@ feedback.
   requests. State dependencies between ordered changes, and explain any coupling that prevents a safe split.
 - Honor repository commit policies, such as DCO sign-off, for every commit in the delivery range, including automated
   commits.
-- Follow the repository's PR template and naming rules. When none exist, use
-  `<ISSUEID|NOISSUE> - [<low-risk|medium-risk|high-risk>] - <Title>`.
-- Scale the PR description to the change: explain the resulting behavior and validation, then material compatibility,
-  feature-gate, rollout, risk, and rollback details when relevant. Include the verification evidence described below.
+- Follow the repository's PR template and naming rules. When none exist, title the pull request
+  `<ISSUEID|NOISSUE> - [<low-risk|medium-risk|high-risk>] - <Title>`. This format is for pull-request titles only;
+  commit subjects follow the repository's own history.
+- Scale the PR description to the change: explain the resulting behavior and validation, then material assumptions,
+  compatibility, feature-gate, rollout, risk, and rollback details when relevant. Include the verification evidence
+  described below.
 - Use the repository's existing validation and delivery workflow. Before publishing changes, review the final diff
   and run the applicable tests, lint, and build checks. For pull-request delivery, follow required CI checks through
   completion and address failures within the task's scope. Report any checks that could not run or remain unresolved.
@@ -53,4 +55,4 @@ Build it from the verification contract, and scale it to the risk: a typo fix ne
   give the user their local paths and say that the description does not include them.
 - State what was not verified and why. "Tests pass" does not replace evidence that the change works.
 
-Use `~/.agents/instructions/code-review.md` for risk classification.
+Use the risk levels in `~/.agents/instructions/workflow.md` for the title's risk tag.

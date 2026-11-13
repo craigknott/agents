@@ -10,8 +10,7 @@ The two most important topics are:
 
 - [Verification contract](instructions/workflow.md#verification-contract) — define done, the oracle, and the baseline
   before editing, so agents can work and check themselves unattended.
-- [Delegation](instructions/delegation.md) — role routing across Claude and Codex models, and how to reach the other
-  provider.
+- [Delegation](instructions/delegation.md) — role routing across Claude and Codex models, and cross-provider review.
 
 The routing is a workload policy, not a benchmark result. Compare task outcomes, latency, and usage before retuning
 effort or routing.
@@ -71,26 +70,10 @@ tools but keep Bash so reviewers can rerun checks.
 
 ### Cross-provider delegation
 
-When the harness has its own cross-provider tool (for example T3 Code), agents use that. Otherwise:
-
-- **Claude Code to Codex** uses OpenAI's official [codex plugin](https://github.com/openai/codex-plugin-cc). Install it
-  once:
-
-  ```sh
-  claude plugin marketplace add openai/codex-plugin-cc
-  claude plugin install codex@openai-codex
-  ```
-
-  Agents use its `codex:codex-rescue` subagent; `/codex:review` and `/codex:adversarial-review` are for you to run.
-  Its optional stop-time review gate is off by default; leave it off unless you are watching the session.
-- **Codex to Claude Code** uses [scripts/claude-delegate.sh](scripts/claude-delegate.sh). It loads the Claude role
-  file, reads the brief from stdin, and prints only Claude's final message. It refuses to run inside a delegated child
-  (`AGENT_DEPTH` of 1 or higher), times out after 30 minutes by default, and never prints output on stdout for a
-  failure, timeout, or empty result. Read-only roles run with `--restricted`, which ignores settings files, so only
-  Read, Grep, Glob, and read-only `git` commands are allowed. It needs `perl`: the script hands the run to
-  [a small supervisor](scripts/claude-delegate-supervisor.pl) that runs Claude in its own process group, so a timeout
-  or cancellation (HUP, INT, or TERM) stops every tool Claude started, and no tool outlives a finished run. A wrapper
-  killed with SIGKILL cannot clean up, so its Claude run keeps going until it ends by itself.
+This pack ships no cross-provider tooling. Agents reach the other provider through the active harness's own delegation
+mechanism, such as T3 Code's. [instructions/delegation.md](instructions/delegation.md#cross-provider-review) says when
+a cross-provider review is needed and what its brief must contain. In a harness without such a mechanism, agents use a
+same-provider reviewer and say so in the report.
 
 ### Codex config
 
@@ -128,24 +111,37 @@ printf '@~/.agents/AGENTS.md\n' > /path/to/tool/instructions-file.md
 - `codex/AGENTS.md`, `codex/agents/` — Codex forwarder and role definitions.
 - `claude/agents/` — Claude Code role definitions.
 - `skills/` — shared skills, read by Codex directly and linked into Claude Code.
-- `scripts/` — installers, their shared helpers, and the Codex-to-Claude delegation script and supervisor.
-- `tests/` — checks for the scripts, pinned models, and role parity.
+- `scripts/` — installers and their shared helpers.
+- `tests/` — checks for the installers, pinned models, role parity, and the routing tables.
+- `tests/behavior/` — scenario prompts that show how a real agent reads the instructions. They call a model, so they
+  run only when you ask.
 
 ## Verify
 
 Run the checks after changing the pack:
 
 ```sh
-for f in scripts/*.sh tests/*.sh; do sh -n "$f"; done
+for f in scripts/*.sh tests/*.sh tests/behavior/*.sh; do sh -n "$f"; done
 for t in tests/*.sh; do sh "$t"; done
 git diff --check
 ```
 
 `tests/models.sh` checks that every pinned Codex model is offered by the local Codex CLI (`models_cache.json`), and that
 Claude models are valid aliases or IDs. `tests/role-parity.sh` checks that each shared role has the same name and
-instructions on both platforms. The other tests check the installers and the delegation script's routing, restriction,
-failure handling, timeout, and nesting guard with a stub CLI. None of these checks shows how a model interprets the
-instructions.
+instructions on both platforms. `tests/routing-tables.sh` checks that the routing tables in this file and in
+`instructions/delegation.md` show the model and effort that each role file pins. The other tests check the installers.
+None of these checks shows how a model interprets the instructions.
+
+To see that, run the scenario prompts after you change how agents handle a request:
+
+```sh
+sh tests/behavior/assumptions.sh claude
+sh tests/behavior/assumptions.sh codex
+```
+
+Each scenario runs one prompt in a throwaway repository with your own CLI configuration. The script checks what the
+agent did to the files, and prints the reply for you to read against the stated expectation. The runs call a model and
+take a few minutes.
 
 After installing, confirm both tools load the shared instructions and roles:
 
