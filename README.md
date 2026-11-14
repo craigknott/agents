@@ -50,8 +50,8 @@ needed for these global instructions.
 ### Skills
 
 `skills/` is the one home for shared skills in the open Agent Skills format. Codex reads `~/.agents/skills` natively as
-its user skills folder; the Claude installer links each skill into `~/.claude/skills`. Skills that third-party tools
-install and update there, such as `no-mistakes`, are listed in `.gitignore` so only skills authored here are tracked.
+its user skills folder; the Claude installer links each skill into `~/.claude/skills`. When a third-party tool installs
+and updates a skill there, list it in `.gitignore` so that only skills authored here are tracked.
 
 ### Roles
 

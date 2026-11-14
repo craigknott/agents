@@ -15,8 +15,6 @@ feedback.
 - Use the repository's existing validation and delivery workflow. Before publishing changes, review the final diff
   and run the applicable tests, lint, and build checks. For pull-request delivery, follow required CI checks through
   completion and address failures within the task's scope. Report any checks that could not run or remain unresolved.
-- `no-mistakes` is optional. Use it only when the user or repository explicitly requests it; do not require or
-  initialize it for ordinary validation, pushes, or pull requests.
 - Complete the requested delivery destination after validation. An explicit request to land on `main` includes that
   final integration; creating a review branch for the gate is an intermediate step.
 
